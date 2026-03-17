@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "PYTHON"
+    ],
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.defaultInterpreterPath": "d:\\OFFICIAL\\VISION GLOBAL\\EnergyMatrix\\PYTHON\\venv\\Scripts\\python.exe"
+}

@@ -1,0 +1,11 @@
+unique_account_id,record_date,username,client_name,project_name,daily_target,quality_percent,remarks
+ACC6001,2025-01-01,user_01,Client A,Project X,fifty,92,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6002,2025-01-02,user_02,Client A,Project X,48,ninety,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6003,2025-01-03,user_03,Client B,Project Y,45,88,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6004,2025-01-04,user_04,Client B,Project Y,sixty,91,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6005,2025-01-05,user_05,Client C,Project Z,55,eighty,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6006,2025-01-06,user_06,Client C,Project Z,52,89,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6007,2025-01-07,user_07,Client D,Project P,40,85,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6008,2025-01-08,user_08,Client D,Project P,42,86,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6009,2025-01-09,user_09,Client E,Project Q,38,90,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"
+ACC6010,2025-01-10,user_10,Client E,Project Q,44,93,"Schema error: Missing required column(s): sub_project_name, designation, audit_status"

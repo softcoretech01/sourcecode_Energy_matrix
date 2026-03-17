@@ -1,0 +1,12 @@
+{
+    "venvPath": "d:\\OFFICIAL\\VISION GLOBAL\\EnergyMatrix\\PYTHON",
+    "venv": "venv",
+    "extraPaths": [
+        "PYTHON"
+    ],
+    "executionEnvironments": [
+        {
+            "root": "PYTHON"
+        }
+    ]
+}
