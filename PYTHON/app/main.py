@@ -53,7 +53,6 @@ app.include_router(total_router, prefix="/api", dependencies=auth_dep)
 app.include_router(customer_share_router, prefix="/api", dependencies=auth_dep)
 app.include_router(eb_bill_router, prefix="/api", dependencies=auth_dep)
 
-# ✅ THIS IS THE IMPORTANT ONE
 app.include_router(eb_upload_router, prefix="/api", dependencies=auth_dep)
 app.include_router(eb_solar_router, prefix="/api", dependencies=auth_dep)
 app.include_router(generation, prefix="/api", dependencies=auth_dep)

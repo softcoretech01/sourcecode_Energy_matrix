@@ -109,24 +109,6 @@ def initialize_database():
     BaseWindmill.metadata.create_all(bind=engine_windmill)
     print("All SQLAlchemy tables have been created.")
 
-    # 1b. ensure certain columns can store longer values
-    try:
-        with get_connection().cursor() as cur:
-            cur.execute("ALTER TABLE master_customers MODIFY phone_no VARCHAR(50)")
-            print("Altered master_customers.phone_no to VARCHAR(50)")
-    except Exception:
-        # might not exist yet or already correct; ignore
-        pass
-
-    try:
-        with get_connection().cursor() as cur:
-            # service_number can exceed 32-bit signed int; use BIGINT to avoid out-of-range errors
-            cur.execute("ALTER TABLE customer_service MODIFY service_number BIGINT")
-            print("Altered customer_service.service_number to BIGINT")
-    except Exception:
-        # might not exist yet or already correct; ignore
-        pass
-    
     # 2. Initialize Stored Procedures from the stored_procedure folder
     sp_dir = os.path.join(os.path.dirname(__file__), "stored_procedure")
     if os.path.exists(sp_dir):

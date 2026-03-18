@@ -21,9 +21,10 @@ class DailyGenerationCreate(BaseModel):
     region: RegionEnum
     transaction_date: Optional[date] = None
     windmill_number: str
-    units: float
+    units: Optional[float] = None
     expected_resume_date: Optional[date] = None
     remarks: Optional[str] = None
+    status: str
     created_by: str
 
 class DailyGenerationResponse(BaseModel):
@@ -31,7 +32,7 @@ class DailyGenerationResponse(BaseModel):
     region: str
     transaction_date: Optional[date] = None
     windmill_number: str
-    units: float
+    units: Optional[float] = None
     status: str
     expected_resume_date: Optional[date]
     remarks: Optional[str]
@@ -47,7 +48,7 @@ class DailyGenerationUpdate(BaseModel):
     region: RegionEnum
     transaction_date: Optional[date] = None
     windmill_number: str
-    units: float
+    units: Optional[float] = None
     expected_resume_date: Optional[date] = None
     remarks: Optional[str] = None
     status: str
@@ -102,7 +103,16 @@ def save_daily_generation(
     )
 
     row = result.mappings().first()
-    db.commit()
+    if row:
+        # Ensure status matches running/not running toggle (stored procedure may set Saved/Posted)
+        db.execute(
+            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
+            {"status": payload.status, "id": row["id"]}
+        )
+        db.commit()
+        row = dict(row)
+        row["status"] = payload.status
+
     return row
 
 
@@ -128,7 +138,16 @@ def post_daily_generation(
     )
 
     row = result.mappings().first()
-    db.commit()
+    if row:
+        # Ensure status matches running/not running toggle (stored procedure may set Saved/Posted)
+        db.execute(
+            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
+            {"status": payload.status, "id": row["id"]}
+        )
+        db.commit()
+        row = dict(row)
+        row["status"] = payload.status
+
     return row
 
 
@@ -161,7 +180,16 @@ def update_daily_generation(
     )
 
     row = result.mappings().first()
-    db.commit()
+    if row:
+        # Ensure status matches running/not running toggle (stored procedure may override)
+        db.execute(
+            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
+            {"status": payload.status, "id": id}
+        )
+        db.commit()
+        row = dict(row)
+        row["status"] = payload.status
+
     return row
 
 
