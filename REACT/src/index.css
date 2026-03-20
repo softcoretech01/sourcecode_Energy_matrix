@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 189 80% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 189 79% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 189 40% 94%;
+    --secondary-foreground: 189 79% 20%;
+
+    --muted: 189 20% 92%;
+    --muted-foreground: 189 30% 45%;
+
+    --accent: 189 40% 90%;
+    --accent-foreground: 189 79% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 189 20% 88%;
+    --input: 189 20% 88%;
+    --ring: 189 79% 27%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 189 79% 27%;
+    --sidebar-foreground: 189 20% 95%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 189 79% 27%;
+    --sidebar-accent: 189 79% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 189 79% 20%;
+    --sidebar-ring: 189 79% 45%;
+
+    /* Standardized theme blue variants to replace pastels */
+    --card-blue: 189 40% 95%;
+    --card-blue-title: 189 79% 27%;
+
+    --card-red: 0 100% 95%;
+    --card-red-title: 0 85% 45%;
+
+    --card-purple: 189 30% 92%;
+    --card-purple-title: 189 79% 35%;
+
+    --card-green: 160 60% 92%;
+    --card-green-title: 160 80% 25%;
+
+    /* Redirecting old pastel vars to shades of the new theme blue */
+    --card-pink: 189 40% 96%;
+    --card-pink-icon: 189 79% 45%;
+
+    --card-yellow: 189 45% 94%;
+    --card-yellow-icon: 189 80% 40%;
+
+    --card-lavender: 189 50% 95%;
+    --card-lavender-icon: 189 79% 35%;
+
+    --card-mint: 189 40% 94%;
+    --card-mint-icon: 189 79% 30%;
+
+    --card-coral: 189 55% 95%;
+    --card-coral-icon: 189 90% 40%;
+
+    --card-peach: 189 60% 94%;
+    --card-peach-icon: 189 90% 45%;
+
+    /* Alert colors */
+    --alert-warning: 0 85% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+@keyframes blink-red-border {
+  0% {
+    border-color: transparent;
+  }
+
+  50% {
+    border-color: rgb(239, 68, 68);
+  }
+
+  100% {
+    border-color: transparent;
+  }
+}
+
+.animate-blink-red-border {
+  animation: blink-red-border 1.5s infinite;
+}
+
+/* Shorter scrollbar for energy allotment table - offset past sticky columns */
+.thin-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+  margin-left: 270px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 2px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

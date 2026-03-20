@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80">
+  <style>
+    .text { font-family: sans-serif; fill: black; font-weight: bold; font-size: 32px; }
+    .sub { font-family: serif; fill: #555; font-size: 14px; letter-spacing: 2px; }
+    .globe { fill: #00BFA5; } /* Brighter teal/green */
+  </style>
+  <!-- No background rect for transparency -->
+  
+  <!-- VISION -->
+  <text x="10" y="45" class="text">VISI</text>
+  <!-- Globe O -->
+  <circle cx="95" cy="35" r="14" class="globe" />
+  <!-- subtle continents details -->
+  <path d="M85,35 Q95,25 105,35 M85,35 Q95,45 105,35" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <text x="115" y="45" class="text">N</text>
+  
+  <!-- GLOBAL -->
+  <text x="150" y="45" class="text">GL</text>
+  <!-- Globe O -->
+  <circle cx="210" cy="35" r="14" class="globe" />
+  <!-- subtle continents details -->
+  <path d="M200,35 Q210,25 220,35 M200,35 Q210,45 220,35" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <text x="230" y="45" class="text">BAL</text>
+  
+  <!-- Separator Line -->
+  <line x1="10" y1="52" x2="290" y2="52" stroke="#ccc" stroke-width="1" />
+  
+  <text x="10" y="70" class="sub">Redefining Outsourcing</text>
+</svg>

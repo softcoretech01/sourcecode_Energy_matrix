@@ -1,0 +1,25 @@
+# Node
+node_modules/
+.npm/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.pytest_cache/
+
+# OS/Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Uploads
+/PYTHON/uploads/
+/uploads/

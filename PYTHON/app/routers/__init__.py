@@ -1,0 +1,1 @@
+from app.models.windmill_models import DailyGeneration
