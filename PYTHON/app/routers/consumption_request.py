@@ -93,27 +93,7 @@ def list_consumption_requests(year: int, month: int, user=Depends(get_current_us
     db = get_db()
     cursor = db.cursor(pymysql.cursors.DictCursor)
     try:
-        query = """
-            SELECT 
-                mc.id AS customer_id,
-                mc.customer_name,
-                cs.id AS service_id,
-                cs.service_number AS sc_number,
-                COALESCE(cc.c1, 0) AS c1,
-                COALESCE(cc.c2, 0) AS c2,
-                COALESCE(cc.c4, 0) AS c4,
-                COALESCE(cc.c5, 0) AS c5,
-                COALESCE(cc.total, 0) AS total,
-                cc.id AS request_id
-            FROM masters.master_customers mc
-            INNER JOIN masters.customer_service cs ON mc.id = cs.customer_id
-            LEFT JOIN windmill.customer_consumption_requests cc ON mc.id = cc.customer_id 
-                AND cs.id = cc.service_id 
-                AND cc.billing_year = %s 
-                AND cc.billing_month = %s
-            ORDER BY mc.customer_name, cs.service_number
-        """
-        cursor.execute(query, (year, month))
+        cursor.callproc("sp_get_consumption_requests", (year, month))
         return cursor.fetchall()
     except Exception as e:
         return {"error": str(e)}

@@ -57,12 +57,9 @@ async def create_total(data: TotalSharesCreate, user: dict = Depends(get_current
             "customer_shares": customer_shares
         }
 
-    # No id=1 row exists; ensure table has no other rows before insert.
-    cursor.execute("DELETE FROM configuration WHERE id != 1")
-    conn.commit()
-
-    cursor.execute(
-        "INSERT INTO configuration (id, total_company_shares, total_investor_shares, total_customer_shares, is_submitted, created_by, created_at) VALUES (1,%s,%s,%s,%s,%s,NOW())",
+    # Upsert using stored procedure; see sp_upsert_total_shares.
+    cursor.callproc(
+        "sp_upsert_total_shares",
         (
             total_company,
             investor,
@@ -77,20 +74,8 @@ async def create_total(data: TotalSharesCreate, user: dict = Depends(get_current
     conn.close()
 
     return {
-        "message": "Total shares created",
+        "message": "Total shares created/updated",
         "id": 1,
-        "customer_shares": customer_shares
-    }
-
-    conn.commit()
-    new_id = cursor.lastrowid
-
-    cursor.close()
-    conn.close()
-
-    return {
-        "message": "Total shares created",
-        "id": new_id,
         "customer_shares": customer_shares
     }
 

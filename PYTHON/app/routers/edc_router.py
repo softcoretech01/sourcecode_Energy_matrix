@@ -38,6 +38,23 @@ async def add_edc(data: EDCCircleCreate, user: dict = Depends(get_current_user))
 
 
 # =====================================================
+# GET ALL EDC FOR DROPDOWN
+# =====================================================
+
+@router.get("/dropdown")
+async def get_edc_dropdown(user: dict = Depends(get_current_user)):
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("CALL sp_get_edc_circle_dropdown()")
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+    return rows
+
+
+# =====================================================
 # GET ALL EDC
 # =====================================================
 

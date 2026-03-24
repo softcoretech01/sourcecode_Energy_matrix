@@ -59,7 +59,6 @@ class DailyGenerationUpdate(BaseModel):
 
 
 @router.get("/", response_model=List[DailyGenerationResponse])
-@router.get("", response_model=List[DailyGenerationResponse])  # alias: /api/daily-generation (no trailing slash)
 def get_generation(
     from_date: date | None = None,
     to_date: date | None = None,
@@ -107,8 +106,8 @@ def save_daily_generation(
     if row:
         # Ensure status matches running/not running toggle (stored procedure may set Saved/Posted)
         db.execute(
-            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
-            {"status": payload.status, "id": row["id"]}
+            text("CALL sp_update_windmill_daily_transaction_status(:id, :status)"),
+            {"id": row["id"], "status": payload.status}
         )
         db.commit()
         row = dict(row)
@@ -142,8 +141,8 @@ def post_daily_generation(
     if row:
         # Ensure status matches running/not running toggle (stored procedure may set Saved/Posted)
         db.execute(
-            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
-            {"status": payload.status, "id": row["id"]}
+            text("CALL sp_update_windmill_daily_transaction_status(:id, :status)"),
+            {"id": row["id"], "status": payload.status}
         )
         db.commit()
         row = dict(row)
@@ -184,8 +183,8 @@ def update_daily_generation(
     if row:
         # Ensure status matches running/not running toggle (stored procedure may override)
         db.execute(
-            text("UPDATE windmill_daily_transaction SET status = :status WHERE id = :id"),
-            {"status": payload.status, "id": id}
+            text("CALL sp_update_windmill_daily_transaction_status(:id, :status)"),
+            {"id": id, "status": payload.status}
         )
         db.commit()
         row = dict(row)
@@ -197,29 +196,44 @@ def update_daily_generation(
 
 @router.get("/windmill-list")
 def get_windmill_list(user: dict = Depends(get_current_user)):
-    
-    conn = get_connection()
+    conn = get_connection()  # masters DB by default
     cursor = conn.cursor()
-    
+
     try:
-        # Get windmills where type = 'windmill' only from master_windmill table
-        cursor.execute("SELECT id, windmill_number FROM master_windmill WHERE type = 'windmill' ORDER BY windmill_number")
-        
-        rows = cursor.fetchall()
-        
         windmills = []
+        try:
+            cursor.callproc("sp_get_windmill_list_dropdown")
+            rows = cursor.fetchall()
+        except Exception as e:
+            # Stored proc may not exist (1305) or has another issue.
+            # Fall back to a direct query against master_windmill.
+            if getattr(e, "args", None) and len(e.args) > 0 and e.args[0] == 1305:
+                cursor.execute("""
+                    SELECT id, windmill_number
+                    FROM master_windmill
+                    WHERE status = 'Active' and is_submitted = 1;
+                """)
+                rows = cursor.fetchall()
+            else:
+                raise
+
         for row in rows:
-            windmills.append({
-                "id": row[0],
-                "windmill_number": row[1]
-            })
-        
+            if isinstance(row, dict):
+                windmills.append({
+                    "id": row.get("id"),
+                    "windmill_number": row.get("windmill_number")
+                })
+            else:
+                windmills.append({
+                    "id": row[0],
+                    "windmill_number": row[1]
+                })
+
         return windmills
-    
+
     finally:
         cursor.close()
         conn.close()
-
 
 
 @router.delete("/delete/{id}")

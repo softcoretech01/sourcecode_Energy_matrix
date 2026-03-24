@@ -35,6 +35,11 @@ def create_capacity(data: CapacityCreate, user=Depends(get_current_user)):
 
     # Fetch the LAST_INSERT_ID returned from procedure
     result = cursor.fetchone()
+    new_id = result[0] if result else None
+
+    # Ensure capacity value is stored exactly as provided
+    if new_id is not None:
+        cursor.execute("UPDATE master_capacity SET capacity=%s WHERE id=%s", (str(data.capacity), new_id))
 
     conn.commit()
 
@@ -43,9 +48,25 @@ def create_capacity(data: CapacityCreate, user=Depends(get_current_user)):
 
     return {
         "message": "Capacity created successfully",
-        "id": result[0] if result else None
+        "id": new_id
     }
 
+
+
+@router.get("/dropdown")
+def get_capacity_dropdown(user=Depends(get_current_user)):
+
+    conn = get_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("CALL sp_get_capacity_dropdown()")
+
+    data = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return data
 
 
 @router.get("/list")
@@ -99,6 +120,9 @@ def update_capacity(id: int, data: dict, user=Depends(get_current_user)):
             user["id"]
         )
     )
+
+    # Ensure the capacity is stored exactly as provided
+    cursor.execute("UPDATE master_capacity SET capacity=%s WHERE id=%s", (str(data["capacity"]), id))
 
     conn.commit()
 

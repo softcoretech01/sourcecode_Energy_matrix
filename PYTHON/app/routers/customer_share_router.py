@@ -67,7 +67,7 @@ async def get_customer_list(user: dict = Depends(get_current_user)):
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("CALL get_customer_list()")
+    cursor.execute("CALL sp_get_customer_dropdown()")
     rows = cursor.fetchall()
 
     cursor.close()

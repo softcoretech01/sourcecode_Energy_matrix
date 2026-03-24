@@ -106,17 +106,12 @@ async def upload_eb_statement_solar(
 
 @router.get("/windmills")
 async def get_solar_windmill_numbers():
-    """Return available solar windmill numbers from masters.master_windmill."""
+    """Return available solar windmill numbers from masters.master_windmill (posted only)."""
     conn = get_connection(db_name=DB_NAME_WINDMILL)
     cursor = conn.cursor()
 
     try:
-        cursor.execute(
-            "SELECT id, windmill_number FROM masters.master_windmill "
-            "WHERE LOWER(`type`)=LOWER(%s) "
-            "ORDER BY windmill_number",
-            ("Solar",),
-        )
+        cursor.callproc("sp_get_solar_windmill_numbers")
         rows = cursor.fetchall()
         data = [
             {"id": row[0], "solar_number": row[1]}

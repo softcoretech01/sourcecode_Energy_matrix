@@ -45,6 +45,7 @@ class EmailMasterResponse(BaseModel):
     email_to: Optional[str]
     email_subject: Optional[str]
     email_content: Optional[str]
+    status: Optional[int]
     is_submitted: Optional[int]
     created_by: Optional[int]
     created_at: Optional[datetime]

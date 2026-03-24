@@ -20,7 +20,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # =====================================================
 # 🔵 CREATE CUSTOMER 
 # =====================================================
-@router.post("/")
 @router.post("")
 async def add_customer(data: CustomerCreate, user: dict = Depends(get_current_user)):
 
@@ -43,6 +42,11 @@ async def add_customer(data: CustomerCreate, user: dict = Depends(get_current_us
     new_id_row = cursor.fetchone()
     new_id = new_id_row[0] if new_id_row else None
 
+    # ensure new customer is active by default, even if stored procedure uses a default inactive state
+    if new_id is not None:
+        desired_status = data.status if data.status is not None else 1
+        cursor.execute("UPDATE master_customers SET status=%s WHERE id=%s", (desired_status, new_id))
+
     conn.commit()
 
     cursor.close()
@@ -50,7 +54,6 @@ async def add_customer(data: CustomerCreate, user: dict = Depends(get_current_us
 
     return {"message": "Customer created successfully", "id": new_id}
 
-@router.get("/")
 @router.get("")
 async def get_customers(user: dict = Depends(get_current_user)):
 
@@ -296,31 +299,17 @@ async def update_customer_se(customer_id: int, se_id: int, data: dict, user: dic
         conn.close()
         raise HTTPException(status_code=400, detail="This Service Number is already added for this customer.")
 
-    cursor.execute(
-        """
-        UPDATE customer_service
-        SET service_number=%s,
-            kva_id=%s,
-            edc_circle_id=%s,
-            status=%s,
-            remarks=%s,
-            is_submitted=%s,
-            modified_by=%s,
-            modified_at=NOW()
-        WHERE id=%s AND customer_id=%s
-        """,
-        (
-            data.get("se_number"),
-            data.get("kva"),
-            data.get("edc_circle"),
-            data.get("status", 1),
-            data.get("remarks"),
-            data.get("is_submitted", 0),
-            user["id"],
-            se_id,
-            customer_id,
-        ),
-    )
+    cursor.callproc("sp_update_customer_se", (
+        customer_id,
+        se_id,
+        data.get("se_number"),
+        data.get("kva"),
+        data.get("edc_circle"),
+        data.get("status", 1),
+        data.get("remarks"),
+        data.get("is_submitted", 0),
+        user["id"]
+    ))
 
     conn.commit()
     cursor.close()
@@ -334,7 +323,7 @@ async def update_customer_se(customer_id: int, se_id: int, data: dict, user: dic
 async def get_customer_contact(customer_id: int, user: dict = Depends(get_current_user)):
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT * FROM customer_contact WHERE customer_id=%s ORDER BY id DESC", (customer_id,))
+    cursor.callproc("sp_get_customer_contacts", (customer_id,))
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -361,7 +350,6 @@ async def add_customer_contact(customer_id: int, data: dict, user: dict = Depend
 
     return {"message": "Contact added successfully"}
 
-
 @router.put("/{customer_id}/contact/{contact_id}")
 async def update_customer_contact(
     customer_id: int,
@@ -369,9 +357,6 @@ async def update_customer_contact(
     data: dict,
     user: dict = Depends(get_current_user),
 ):
-    """
-    Update an existing contact row for a customer.
-    """
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -386,25 +371,30 @@ async def update_customer_contact(
         conn.close()
         raise HTTPException(status_code=404, detail="Contact not found for this customer")
 
-    cursor.execute(
-        """
-        UPDATE customer_contact
-        SET contact_person=%s,
-            phone=%s,
-            is_submitted=%s,
-            modified_by=%s,
-            modified_at=NOW()
-        WHERE id=%s AND customer_id=%s
-        """,
-        (
-            data.get("contact_person_name"),
-            data.get("phone_number"),
-            data.get("is_submitted", 0),
-            user["id"],
-            contact_id,
-            customer_id,
-        ),
-    )
+    cursor.callproc("sp_update_customer_contact", (
+        customer_id,
+        contact_id,
+        data.get("contact_person_name"),
+        data.get("phone_number"),
+        data.get("is_submitted", 0),
+        user["id"]
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return {"message": "Contact updated successfully"}
+
+
+    cursor.callproc("sp_update_customer_contact", (
+        customer_id,
+        contact_id,
+        data.get("contact_person_name"),
+        data.get("phone_number"),
+        data.get("is_submitted", 0),
+        user["id"]
+    ))
 
     conn.commit()
     cursor.close()
@@ -423,15 +413,7 @@ async def get_customer_uploads(customer_id: int, user: dict = Depends(get_curren
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     validate_customer(cursor, customer_id)
-    cursor.execute(
-        """SELECT upload_ppa, upload_share_transfer_form_certificate, upload_share_certificate,
-                  pledge_agreement, share_holding_agreement
-           FROM customer_uploads
-           WHERE customer_id = %s
-           ORDER BY id DESC
-           LIMIT 1""",
-        (customer_id,),
-    )
+    cursor.callproc("sp_get_customer_uploads", (customer_id,))
     row = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -498,7 +480,6 @@ async def upload_customer_docs(
             buffer.write(await file.read())
 
         return file.filename, path
-
     try:
         ppa_name, ppa_path = await save_file(ppa_upload)
         st_name, st_path = await save_file(share_transfer_upload)
@@ -518,31 +499,16 @@ async def upload_customer_docs(
         if sh_name is None:
             sh_name = prev.get("share_holding_agreement")
 
-        # if a row already exists for this customer, update it instead of inserting a new one
-        prev_id = None
-        prev_cur = conn.cursor(pymysql.cursors.DictCursor)
-        try:
-            prev_cur.execute(
-                "SELECT id FROM customer_uploads WHERE customer_id = %s ORDER BY id DESC LIMIT 1",
-                (customer_id,)
-            )
-            row = prev_cur.fetchone()
-            if row:
-                prev_id = row['id']
-        finally:
-            prev_cur.close()
-
-        if prev_id:
-            cursor.execute(
-                "UPDATE customer_uploads SET upload_ppa=%s, upload_share_transfer_form_certificate=%s, upload_share_certificate=%s, pledge_agreement=%s, share_holding_agreement=%s, modified_by=%s, modified_at=NOW() WHERE id=%s",
-                (ppa_name, st_name, sc_name, pledge_name, sh_name, user["id"], prev_id)
-            )
-        else:
-            cursor.execute("CALL sp_add_customer_uploads(%s,%s,%s,%s,%s,%s,%s)", (
-                customer_id,
-                ppa_name, st_name, sc_name, pledge_name, sh_name,
-                user["id"]
-            ))
+        # Upsert using stored procedure
+        cursor.callproc("sp_upsert_customer_uploads", (
+            customer_id,
+            ppa_name,
+            st_name,
+            sc_name,
+            pledge_name,
+            sh_name,
+            user["id"]
+        ))
 
         conn.commit()
         return {"message": "Files uploaded successfully"}
@@ -562,10 +528,7 @@ async def get_customer_agreed_units(customer_id: int, user: dict = Depends(get_c
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     validate_customer(cursor, customer_id)
     
-    cursor.execute(
-        "SELECT month,c1_units,c2_units,c4_units,c5_units,total_agreement_number FROM customer_agreed WHERE customer_id = %s",
-        (customer_id,)
-    )
+    cursor.callproc("sp_get_customer_agreed_units", (customer_id,))
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -604,7 +567,7 @@ async def save_customer_agreed_units(
 
     try:
         # Delete old rows
-        cursor.execute("DELETE FROM customer_agreed WHERE customer_id = %s", (customer_id,))
+        cursor.callproc("sp_delete_customer_agreed_units", (customer_id,))
         
         total_agreed = None
         if data.total_agreed_units:
@@ -631,15 +594,79 @@ async def save_customer_agreed_units(
             c5 = float(row.c5) if row.c5 else None
             monthly_total = int((c1 or 0) + (c2 or 0) + (c4 or 0) + (c5 or 0))
 
-            cursor.execute(
-                """INSERT INTO customer_agreed 
-                   (customer_id, total_agreement_number, month, c1_units, c2_units, c4_units, c5_units, monthly_total, grand_total, created_by, created_at, is_submitted) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)""",
-                (customer_id, total_agreed, row.month, c1, c2, c4, c5, monthly_total, grand_total, user["id"], 1)
-            )
+            cursor.callproc("sp_insert_customer_agreed_unit", (
+                customer_id,
+                total_agreed,
+                row.month,
+                c1,
+                c2,
+                c4,
+                c5,
+                monthly_total,
+                grand_total,
+                user["id"]
+            ))
 
         conn.commit()
         return {"message": "Agreed units saved successfully"}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/{customer_id}/agreed-units")
+async def update_customer_agreed_units(
+    customer_id: int,
+    data: AgreedUnitsRequest,
+    user: dict = Depends(get_current_user)
+):
+    # Reuse same save logic for update
+    conn = get_connection()
+    cursor = conn.cursor()
+    validate_customer(cursor, customer_id)
+
+    try:
+        cursor.callproc("sp_delete_customer_agreed_units", (customer_id,))
+
+        total_agreed = None
+        if data.total_agreed_units:
+            try:
+                total_agreed = int(float(data.total_agreed_units))
+            except (ValueError, TypeError):
+                total_agreed = None
+
+        grand_total = 0
+        for row in data.unit_allocation:
+            c1 = float(row.c1) if row.c1 else 0.0
+            c2 = float(row.c2) if row.c2 else 0.0
+            c4 = float(row.c4) if row.c4 else 0.0
+            c5 = float(row.c5) if row.c5 else 0.0
+            grand_total += int(c1 + c2 + c4 + c5)
+
+        for row in data.unit_allocation:
+            c1 = float(row.c1) if row.c1 else None
+            c2 = float(row.c2) if row.c2 else None
+            c4 = float(row.c4) if row.c4 else None
+            c5 = float(row.c5) if row.c5 else None
+            monthly_total = int((c1 or 0) + (c2 or 0) + (c4 or 0) + (c5 or 0))
+
+            cursor.callproc("sp_insert_customer_agreed_unit", (
+                customer_id,
+                total_agreed,
+                row.month,
+                c1,
+                c2,
+                c4,
+                c5,
+                monthly_total,
+                grand_total,
+                user["id"]
+            ))
+
+        conn.commit()
+        return {"message": "Agreed units updated successfully"}
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))

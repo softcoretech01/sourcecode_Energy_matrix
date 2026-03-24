@@ -12,22 +12,20 @@ def create_investor(data: dict, user=Depends(get_current_user)):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        INSERT INTO master_investors (
-            investor_name,
-            share_quantity,
-            created_by,
-            created_at,
-            status,
-            is_submitted
-        ) VALUES (%s, %s, %s, NOW(), %s, 0)
-        """,
+    is_submitted = data.get("is_submitted", 0)
+    try:
+        is_submitted = int(is_submitted)
+    except (TypeError, ValueError):
+        is_submitted = 0
+
+    cursor.callproc(
+        "sp_insert_investor",
         (
             data.get("investor_name", ""),
             data.get("share_quantity", 0),
             user["id"],
             1,
+            is_submitted,
         )
     )
 
@@ -44,7 +42,7 @@ def get_investors(user=Depends(get_current_user)):
     conn = get_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("SELECT * FROM master_investors ORDER BY id DESC")
+    cursor.callproc("sp_get_investors")
 
     data = cursor.fetchall()
 
@@ -60,10 +58,7 @@ def get_investor_by_id(id: int, user=Depends(get_current_user)):
     conn = get_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute(
-        "SELECT * FROM master_investors WHERE id=%s",
-        (id,)
-    )
+    cursor.callproc("sp_get_investor_by_id", (id,))
 
     data = cursor.fetchone()
 
@@ -85,22 +80,14 @@ def update_investor(id: int, data: dict, user=Depends(get_current_user)):
     except (TypeError, ValueError):
         status = 1
 
-    cursor.execute(
-        """
-        UPDATE master_investors
-        SET investor_name=%s,
-            share_quantity=%s,
-            status=%s,
-            modified_by=%s,
-            modified_at=NOW()
-        WHERE id=%s
-        """,
+    cursor.callproc(
+        "sp_update_investor",
         (
+            id,
             data["investor_name"],
             data["share_quantity"],
             status,
-            user["id"],
-            id
+            user["id"]
         )
     )
 
@@ -118,16 +105,7 @@ def submit_investor(id: int, user=Depends(get_current_user)):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        UPDATE master_investors
-        SET is_submitted=1,
-            modified_by=%s,
-            modified_at=NOW()
-        WHERE id=%s
-        """,
-        (user["id"], id)
-    )
+    cursor.callproc("sp_submit_investor", (id, user["id"]))
 
     conn.commit()
 

@@ -21,40 +21,8 @@ try:
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SHOW COLUMNS FROM master_windmill LIKE 'ae_name'")
-    has_ae_name = cursor.rowcount > 0
-    cursor.execute("SHOW COLUMNS FROM master_windmill LIKE 'am_name'")
-    has_am_name = cursor.rowcount > 0
-
-    # If only am_name exists, rename it to ae_name.
-    if has_am_name and not has_ae_name:
-        cursor.execute("ALTER TABLE master_windmill CHANGE COLUMN am_name ae_name VARCHAR(100) NULL")
-        conn.commit()
-        has_ae_name = True
-        has_am_name = False
-
-    # If both exist, migrate any data from am_name into ae_name (when empty), then drop am_name.
-    if has_am_name and has_ae_name:
-        cursor.execute(
-            "UPDATE master_windmill SET ae_name = am_name "
-            "WHERE (ae_name IS NULL OR ae_name = '') AND (am_name IS NOT NULL AND am_name <> '')"
-        )
-        conn.commit()
-        cursor.execute("ALTER TABLE master_windmill DROP COLUMN am_name")
-        conn.commit()
-        has_am_name = False
-
-    # Ensure ae_name exists even if neither column did.
-    if not has_ae_name:
-        cursor.execute("ALTER TABLE master_windmill ADD COLUMN ae_name VARCHAR(100) NULL")
-        conn.commit()
-
-    # Ensure contact_number exists (added later in the UI/DTOs)
-    cursor.execute("SHOW COLUMNS FROM master_windmill LIKE 'contact_number'")
-    has_contact_number = cursor.rowcount > 0
-    if not has_contact_number:
-        cursor.execute("ALTER TABLE master_windmill ADD COLUMN contact_number VARCHAR(20) NULL")
-        conn.commit()
+    cursor.callproc("sp_initialize_windmill_schema")
+    conn.commit()
 
     cursor.close()
     conn.close()
@@ -65,7 +33,7 @@ except Exception:
 # -------------------------------------------------------
 # CREATE WINDMILL
 # -------------------------------------------------------
-@router.post("/", response_model=WindmillMessage)
+@router.post("", response_model=WindmillMessage)
 async def create_windmill(data: WindmillCreate, user: dict = Depends(get_current_user)):
     try:
         conn = get_connection()
@@ -142,8 +110,7 @@ async def create_windmill(data: WindmillCreate, user: dict = Depends(get_current
 # -------------------------------------------------------
 # GET ALL WINDMILLS
 # -------------------------------------------------------
-@router.get("/")
-@router.get("")  # alias: /api/windmills (no trailing slash)
+@router.get("")
 async def get_windmills(user: dict = Depends(get_current_user)):
     try:
         conn = get_connection()
@@ -290,10 +257,7 @@ async def get_windmill_uploads(windmill_id: int, user: dict = Depends(get_curren
 
         validate_windmill(cursor, windmill_id)
 
-        cursor.execute(
-            "SELECT id, document_type, file_path, created_at FROM master_windmill_upload_docs WHERE windmill_id=%s",
-            (windmill_id,)
-        )
+        cursor.callproc("sp_get_windmill_uploads", (windmill_id,))
         rows = list(cursor.fetchall() or [])
 
         # Ensure we return the latest upload per document type (avoid stale/older files showing).
@@ -344,7 +308,7 @@ async def upload_windmill_docs(
         validate_windmill(cursor, windmill_id)
 
         # Prevent uploading docs after posting.
-        cursor.execute("SELECT is_submitted FROM master_windmill WHERE id=%s", (windmill_id,))
+        cursor.callproc("sp_check_windmill_submitted", (windmill_id,))
         current = cursor.fetchone()
         if current and current[0] == 1:
             raise HTTPException(status_code=403, detail="Cannot upload documents for a posted windmill")
@@ -375,10 +339,7 @@ async def upload_windmill_docs(
 
         def add_db_upload(doc_type, path):
             if path:
-                cursor.execute(
-                    "INSERT INTO master_windmill_upload_docs (windmill_id, document_type, file_path, created_by, created_at) VALUES (%s,%s,%s,%s,NOW())",
-                    (windmill_id, doc_type, path, user["id"])
-                )
+                cursor.callproc("sp_insert_windmill_upload", (windmill_id, doc_type, path, user["id"]))
         add_db_upload("COMMISSION_CERTIFICATE", cc_path)
         add_db_upload("NAME_TRANSFER_DOCUMENT", nt_path)
         add_db_upload("PPA", ppa_path)

@@ -26,6 +26,8 @@ async def add_email(data: EmailMasterCreate, user: dict = Depends(get_current_us
         conn = get_connection()
         cursor = conn.cursor()
 
+        status = data.status if data.status is not None else 1
+
         cursor.execute("CALL sp_add_email(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", (
             data.email_id,
             data.email_category,
@@ -36,7 +38,7 @@ async def add_email(data: EmailMasterCreate, user: dict = Depends(get_current_us
             data.email_subject,
             data.email_content,
             data.is_submitted,
-            1
+            status
         ))
 
         conn.commit()
@@ -126,24 +128,9 @@ async def update_email(email_id: int, data: EmailMasterUpdate, user: dict = Depe
     status = data.status if data.status is not None else existing.get("status", 1)
     is_submitted = data.is_submitted if data.is_submitted is not None else existing.get("is_submitted", 0)
 
-    cursor.execute(
-        """
-        UPDATE master_email SET
-            email_id=%s,
-            email_category=%s,
-            email_time=%s,
-            occurrences=%s,
-            email_cc=%s,
-            email_to=%s,
-            email_subject=%s,
-            email_content=%s,
-            status=%s,
-            is_submitted=%s,
-            modified_by=%s,
-            modified_at=NOW()
-        WHERE id=%s
-        """,
-        (
+    try:
+        cursor.callproc("sp_update_email", [
+            email_id,
             data.email_id,
             data.email_category,
             email_time,
@@ -154,16 +141,20 @@ async def update_email(email_id: int, data: EmailMasterUpdate, user: dict = Depe
             data.email_content,
             status,
             is_submitted,
-            user["id"],
-            email_id,
-        )
-    )
+            user["id"]
+        ])
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-    return {"message": "Email configuration updated successfully"}
+        return {"message": "Email configuration updated successfully"}
+
+    except Exception as e:
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # =====================================================

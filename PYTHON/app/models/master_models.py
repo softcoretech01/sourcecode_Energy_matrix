@@ -8,7 +8,7 @@ class CapacityMaster(Base):
     __tablename__ = "master_capacity"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    capacity = Column(String(50))
+    capacity = Column(DECIMAL(12, 2))
     status = Column(SmallInteger, default=1) # 1 active, 0 inactive
     
     created_by = Column(Integer)

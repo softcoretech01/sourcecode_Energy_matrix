@@ -37,6 +37,18 @@ def create_transmission(data: dict, user=Depends(get_current_user)):
     return {"message": "Transmission created"}
 
 
+@router.get("/dropdown")
+def get_transmission_dropdown(user: dict = Depends(get_current_user)):
+
+    conn = get_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.callproc("sp_get_kva_dropdown")
+    data = cursor.fetchall() 
+
+    return data
+
+
 @router.get("/list")
 def list_transmission(user: dict = Depends(get_current_user)):
 
@@ -54,12 +66,7 @@ def get_avg_loss(user=Depends(get_current_user)):
     conn = get_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("""
-        SELECT average_transmission_loss_percent
-        FROM configuration 
-       
-    """)
-
+    cursor.callproc("sp_get_avg_transmission_loss")
     data = cursor.fetchone()
 
     return {"avg_loss": data["average_transmission_loss_percent"] if data else 0}
@@ -100,11 +107,15 @@ def update_transmission(id: int, data: dict, user=Depends(get_current_user)):
         )
 
         # status is not available on old stored proc in this code path;
-        # do a direct update when provided from UI toggle.
+        # call SP for status update.
         if data.get("status") is not None:
-            cursor.execute(
-                "UPDATE transmission_loss_master SET status=%s WHERE id=%s",
-                (int(data.get("status")), id)
+            cursor.callproc(
+                "sp_update_transmission_loss_status",
+                (
+                    id,
+                    int(data.get("status")),
+                    user["id"]
+                )
             )
 
         cursor.callproc("sp_update_avg_transmission_loss")
