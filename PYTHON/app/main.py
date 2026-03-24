@@ -4,6 +4,8 @@ from app.utils.auth_utils import get_current_user
 from app.database import initialize_database
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 # Routers
 from app.routers.customer_router import router as customer_router
@@ -22,6 +24,16 @@ from app.routers.capacity_routes import router as capacity_routes
 from app.routers.consumption_routes import router as consumption_routes
 from app.routers.transmission_routes import router as transmission_routes
 
+class TrailingSlashMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        path = request.scope["path"]
+        # Add trailing slash to API paths that don't have one and aren't file paths
+        if path.startswith("/api/") and not path.endswith("/") and "." not in path.split("/")[-1]:
+            request.scope["path"] = path + "/"
+            if "raw_path" in request.scope:
+                request.scope["raw_path"] = request.scope["raw_path"] + b"/"
+        return await call_next(request)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Running database initialization on startup...")
@@ -30,6 +42,9 @@ async def lifespan(app: FastAPI):
     print("Application shutdown.")
 
 app = FastAPI(lifespan=lifespan, redirect_slashes=False)
+
+# Fix trailing slash: normalize /api/foo → /api/foo/ so routes match without 307 redirects
+app.add_middleware(TrailingSlashMiddleware)
 
 # Allow frontend access
 app.add_middleware(
