@@ -143,6 +143,7 @@ async def create_windmill(data: WindmillCreate, user: dict = Depends(get_current
 # GET ALL WINDMILLS
 # -------------------------------------------------------
 @router.get("/")
+@router.get("")  # alias: /api/windmills (no trailing slash)
 async def get_windmills(user: dict = Depends(get_current_user)):
     try:
         conn = get_connection()

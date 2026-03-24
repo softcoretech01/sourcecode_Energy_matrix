@@ -59,6 +59,7 @@ class DailyGenerationUpdate(BaseModel):
 
 
 @router.get("/", response_model=List[DailyGenerationResponse])
+@router.get("", response_model=List[DailyGenerationResponse])  # alias: /api/daily-generation (no trailing slash)
 def get_generation(
     from_date: date | None = None,
     to_date: date | None = None,
