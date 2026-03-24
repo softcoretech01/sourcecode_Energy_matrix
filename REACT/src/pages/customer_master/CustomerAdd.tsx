@@ -48,7 +48,7 @@ export default function CustomerAdd() {
     const [newEdcCircle, setNewEdcCircle] = useState(""); // keep as string for Select, convert to number on save
     const [newSeRemarks, setNewSeRemarks] = useState("");
     const [newSeStatus, setNewSeStatus] = useState("active");
-    const [edcList, setEdcList] = useState<{id: number; edc_name?: string; edc_circle?: string}[]>([]);
+    const [edcList, setEdcList] = useState<{ id: number; edc_name?: string; edc_circle?: string }[]>([]);
     const [kvaList, setKvaList] = useState<{ id: number; kva?: string; capacity?: string }[]>([]);
 
     React.useEffect(() => {
@@ -201,7 +201,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return false;
         }
         const payload: any = {
@@ -259,7 +259,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return false;
         }
         // Use remembered customer ID if available
@@ -310,7 +310,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return false;
         }
         // Use remembered customer ID if available
@@ -346,7 +346,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return false;
         }
         const customerId = createdCustomerId;
@@ -393,9 +393,9 @@ export default function CustomerAdd() {
 
     const saveAgreedUnits = async () => {
         // 🔍 VALIDATION: Check if Total Agreed Units matches Grand Total
-        const grandTotal = unitAllocation.reduce((sum, row) => 
+        const grandTotal = unitAllocation.reduce((sum, row) =>
             sum + (Number(row.c1) || 0) + (Number(row.c2) || 0) + (Number(row.c4) || 0) + (Number(row.c5) || 0), 0);
-        
+
         const totalAgreed = Number(totalAgreedUnits) || 0;
 
         if (totalAgreed !== grandTotal) {
@@ -407,7 +407,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return false;
         }
         let customerId = createdCustomerId;
@@ -473,7 +473,7 @@ export default function CustomerAdd() {
 
             if (res.ok) {
                 toast.success("Customer posted successfully!");
-                navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`);
+                navigate("/master/customers");
             } else {
                 const text = await res.text();
                 toast.error("Failed to post customer: " + text);
@@ -511,24 +511,24 @@ export default function CustomerAdd() {
                     </h1>
                     <div className="flex gap-2">
                         <Button
-    size="sm"
-    className="bg-red-600 hover:bg-red-700 text-white h-8 px-4 rounded-md transition-all shadow-sm"
-    onClick={handleSave}
->
-    Save
-</Button>
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white h-8 px-4 rounded-md transition-all shadow-sm"
+                            onClick={handleSave}
+                        >
+                            Save
+                        </Button>
                         <Button
-    size="sm"
-    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4 rounded-md transition-all shadow-sm"
-    onClick={() => setShowPostConfirm(true)}
->
-    Post
-</Button>
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4 rounded-md transition-all shadow-sm"
+                            onClick={() => setShowPostConfirm(true)}
+                        >
+                            Post
+                        </Button>
                         <Button
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`)}
+                            onClick={() => navigate("/master/customers")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
@@ -621,59 +621,59 @@ export default function CustomerAdd() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-slate-700">Customer Name</label>
                                         <Input
-    value={customerName}
-    onChange={(e) => setCustomerName(e.target.value)}
-    placeholder="Enter Customer Name"
-    className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
-/>
+                                            value={customerName}
+                                            onChange={(e) => setCustomerName(e.target.value)}
+                                            placeholder="Enter Customer Name"
+                                            className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-slate-700">City</label>
                                         <Input
-    value={city}
-    onChange={(e) => setCity(e.target.value)}
-    placeholder="Enter City"
-    className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
-/>
+                                            value={city}
+                                            onChange={(e) => setCity(e.target.value)}
+                                            placeholder="Enter City"
+                                            className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-slate-700">Phone No</label>
                                         <Input
-    value={phoneNo}
-    onChange={(e) => setPhoneNo(e.target.value)}
-    placeholder="Enter Phone No"
-    className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
-/>
+                                            value={phoneNo}
+                                            onChange={(e) => setPhoneNo(e.target.value)}
+                                            placeholder="Enter Phone No"
+                                            className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-slate-700">Email</label>
                                         <Input
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    placeholder="Enter Email"
-    type="email"
-    className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
-/>
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Enter Email"
+                                            type="email"
+                                            className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                        />
                                     </div>
                                     <div className="space-y-2 md:col-span-2">
                                         <label className="text-sm font-semibold text-slate-700">Address</label>
                                         <Textarea
-    value={address}
-    onChange={(e) => setAddress(e.target.value)}
-    placeholder="Enter Address"
-    maxLength={100}
-    className="bg-white border-slate-300 min-h-[80px] text-sm focus:ring-blue-500"
-/>
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            placeholder="Enter Address"
+                                            maxLength={100}
+                                            className="bg-white border-slate-300 min-h-[80px] text-sm focus:ring-blue-500"
+                                        />
                                         <div className="text-right text-xs text-slate-500">{address.length}/100</div>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-semibold text-slate-700">GST Number</label>
                                         <Input
-    value={gstNumber}
-    onChange={(e) => setGstNumber(e.target.value)}
-    placeholder="Enter GST Number"
-    className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
-/>
+                                            value={gstNumber}
+                                            onChange={(e) => setGstNumber(e.target.value)}
+                                            placeholder="Enter GST Number"
+                                            className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                        />
                                     </div>
 
                                 </div>
@@ -790,13 +790,13 @@ export default function CustomerAdd() {
                                                             <td className="px-4 py-3 font-medium text-slate-900 border-r border-slate-100">{item.seNumber}</td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100">
                                                                 {kvaList.find(k => String(k.id) === String(item.kva))?.kva ||
-                                                                 kvaList.find(k => String(k.id) === String(item.kva))?.capacity ||
-                                                                 item.kva}
+                                                                    kvaList.find(k => String(k.id) === String(item.kva))?.capacity ||
+                                                                    item.kva}
                                                             </td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100">
                                                                 {edcList.find(e => e.id === item.edcCircle)?.edc_name ||
-                                                                 edcList.find(e => e.id === item.edcCircle)?.edc_circle ||
-                                                                 item.edcCircle}
+                                                                    edcList.find(e => e.id === item.edcCircle)?.edc_circle ||
+                                                                    item.edcCircle}
                                                             </td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100 capitalize">{item.status}</td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100">{item.remarks}</td>
@@ -1048,7 +1048,7 @@ export default function CustomerAdd() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                             onClick={handlePost}
                             className="bg-slate-900 hover:bg-slate-800 text-white"
                         >

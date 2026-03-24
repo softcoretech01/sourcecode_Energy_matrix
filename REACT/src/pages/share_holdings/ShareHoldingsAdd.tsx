@@ -214,7 +214,7 @@ export default function ShareHoldingsAdd() {
             });
 
             // After saving, navigate back to the list view
-            navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`);
+            navigate("/master/share-holdings");
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             const err = error as any;
@@ -284,7 +284,7 @@ export default function ShareHoldingsAdd() {
             // Refresh allocated shares before navigating away
             await fetchAllocatedShares();
 
-            navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`);
+            navigate("/master/share-holdings");
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             const err = error as any;
@@ -330,7 +330,7 @@ export default function ShareHoldingsAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`)}
+                            onClick={() => navigate("/master/share-holdings")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

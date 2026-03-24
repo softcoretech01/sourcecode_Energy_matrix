@@ -71,7 +71,7 @@ export default function EdcMasterEdit() {
                 throw new Error(data.detail || data.message || `HTTP ${res.status}`);
             }
             toast({ title: data.message || "EDC Circle updated successfully" });
-            navigate(`${import.meta.env.VITE_BASE_URL}/master/edc-circle`);
+            navigate("/master/edc-circle");
         } catch (err: any) {
             console.error("Update EDC error", err);
             toast({
@@ -113,7 +113,7 @@ export default function EdcMasterEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/edc-circle`)}
+                            onClick={() => navigate("/master/edc-circle")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

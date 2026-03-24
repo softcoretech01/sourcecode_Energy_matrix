@@ -90,7 +90,7 @@ export default function WindmillList() {
 useEffect(() => {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+    navigate("/login");
     return;
   }
 
@@ -124,7 +124,7 @@ const fetchGeneration = async () => {
     // Optional: handle 401
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       alert("Session expired. Please login again.");
-      navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+      navigate("/login");
     }
   }
 };
@@ -137,7 +137,7 @@ const fetchWindmills = async () => {
     console.error("Error fetching windmills:", error);
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       alert("Session expired. Please login again.");
-      navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+      navigate("/login");
     }
   }
 };
@@ -313,7 +313,7 @@ const handleExportExcel = () => {
                             <Button size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-3 shrink-0" onClick={handleSearch}>
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill/add`)}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3" onClick={() => navigate("/windmill/add")}>
                                 + New
                             </Button>
                            <Button
@@ -403,7 +403,7 @@ const handleExportExcel = () => {
       ? "text-gray-400 cursor-not-allowed"
       : "text-primary hover:text-primary hover:bg-primary/10"
   )}
-  onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill/edit/${row.id}`)}
+  onClick={() => navigate(`/windmill/edit/${row.id}`)}
 >
   <Edit className="h-4 w-4" />
 </Button>

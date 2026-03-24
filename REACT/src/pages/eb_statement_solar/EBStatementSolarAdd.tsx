@@ -133,7 +133,7 @@ export default function EBStatementSolarAdd() {
               size="sm"
               variant="outline"
               className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-              onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar`)}
+              onClick={() => navigate("/eb-statement-solar")}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -150,7 +150,7 @@ export default function EBStatementSolarAdd() {
                 <Button onClick={() => window.location.reload()} size="sm">
                   Retry
                 </Button>
-                <Button onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill/add`)} size="sm" variant="outline">
+                <Button onClick={() => navigate("/master/windmill/add")} size="sm" variant="outline">
                   Add Solar in Master Windmill
                 </Button>
               </div>
@@ -320,7 +320,7 @@ export default function EBStatementSolarAdd() {
                       sessionStorage.setItem("ebStatementSolarMonth", selectedMonth);
                       sessionStorage.setItem("ebStatementSolarYear", selectedYear);
 
-                      navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar/pdf`);
+                      navigate("/eb-statement-solar/pdf");
                     } else {
                       toast.error(data.message || "Upload failed");
                     }

@@ -47,7 +47,7 @@ const handleSubmit = async (status: "Saved" | "Posted") => {
         await api.post("/transmission/create", payload);
 
        
-        navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss`);
+        navigate("/master/transmission-loss");
 
     } catch (err: any) {
         console.error("Error:", err.response?.data);
@@ -81,7 +81,7 @@ const handleSubmit = async (status: "Saved" | "Posted") => {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss`)}
+                            onClick={() => navigate("/master/transmission-loss")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

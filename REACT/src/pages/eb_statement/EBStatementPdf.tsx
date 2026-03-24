@@ -99,7 +99,7 @@ const EBStatementPdf = () => {
             <div className="flex h-screen flex-col items-center justify-center space-y-4">
                 <FileText className="h-12 w-12 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">Statement data not found</h2>
-                <Button onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement`)}>Go Back</Button>
+                <Button onClick={() => navigate("/eb-statement")}>Go Back</Button>
             </div>
         );
     }
@@ -109,7 +109,7 @@ const EBStatementPdf = () => {
             <div className="mx-auto max-w-5xl space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Button variant="ghost" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement`) }>
+                        <Button variant="ghost" onClick={() => navigate("/eb-statement") }>
                             <ArrowLeft className="mr-2 h-4 w-4" /> Back
                         </Button>
                         <h1 className="text-2xl font-bold text-slate-900">EB Statement Data</h1>

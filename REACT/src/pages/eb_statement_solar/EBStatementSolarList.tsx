@@ -279,7 +279,7 @@ export default function EBStatementSolarList() {
                             <Button size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-4" onClick={fetchSolarStatements}>
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar/add`)}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate("/eb-statement-solar/add")}>
                                 + New
                             </Button>
 
@@ -351,7 +351,7 @@ export default function EBStatementSolarList() {
                                                             console.warn("Failed to load parsed statement data", err);
                                                         }
 
-                                                        navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar/pdf`);
+                                                        navigate("/eb-statement-solar/pdf");
                                                     };
 
                                                     return (

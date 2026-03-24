@@ -49,7 +49,7 @@ const handleUpdate = async () => {
 
         await api.put(`/capacity/update/${id}`, payload);
 
-        navigate(`${import.meta.env.VITE_BASE_URL}/master/capacity`);
+        navigate("/master/capacity");
 
     } catch (error) {
         console.error(error);
@@ -73,7 +73,7 @@ const handlePost = async () => {
 
        
 
-        navigate(`${import.meta.env.VITE_BASE_URL}/master/capacity`);
+        navigate("/master/capacity");
 
     } catch (error) {
         console.error(error);
@@ -118,7 +118,7 @@ Master Capacity - Update
 size="sm"
 variant="outline"
 className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/capacity`)}
+onClick={() => navigate("/master/capacity")}
 >
 <ArrowLeft className="h-4 w-4" />
 </Button>

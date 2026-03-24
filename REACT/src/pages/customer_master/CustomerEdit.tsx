@@ -641,7 +641,7 @@ export default function CustomerEdit(): JSX.Element {
                 toast.success(getSuccessMsg());
                 
                 if (isPosting) {
-                    navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`);
+                    navigate("/master/customers");
                 } else {
                     moveToNextTab();
                 }
@@ -695,7 +695,7 @@ export default function CustomerEdit(): JSX.Element {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`)}
+                            onClick={() => navigate("/master/customers")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

@@ -86,7 +86,7 @@ export default function EBBillAdd() {
                     console.warn("failed to create object URL for PDF", err);
                 }
 
-            navigate(`${import.meta.env.VITE_BASE_URL}/windmill/eb-bill/pdf`);
+            navigate("/windmill/eb-bill/pdf");
 
         } catch (err) {
             console.error(err);
@@ -132,7 +132,7 @@ export default function EBBillAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill/eb-bill`)}
+                            onClick={() => navigate("/windmill/eb-bill")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

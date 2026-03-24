@@ -93,7 +93,7 @@ export default function WindmillEdit() {
 
             const res = await api.put(`/daily-generation/update/${id}`, payload);
             toast({ title: "Updated", description: "Windmill transaction updated successfully." });
-            navigate(`${import.meta.env.VITE_BASE_URL}/windmill`);
+            navigate("/windmill");
         } catch (err: any) {
             console.error("Update failed", err);
             toast({ title: "Update failed", description: err?.response?.data?.detail || "Unable to update record.", variant: "destructive" });
@@ -122,7 +122,7 @@ export default function WindmillEdit() {
 
             await api.put(`/daily-generation/update/${id}`, payload); // use update route
             toast({ title: "Posted", description: "Windmill transaction posted successfully." });
-            navigate(`${import.meta.env.VITE_BASE_URL}/windmill`);
+            navigate("/windmill");
         } catch (err: any) {
             console.error("Post failed", err);
             toast({ title: "Post failed", description: err?.response?.data?.detail || "Unable to post record.", variant: "destructive" });
@@ -148,7 +148,7 @@ export default function WindmillEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill`)}
+                            onClick={() => navigate("/windmill")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

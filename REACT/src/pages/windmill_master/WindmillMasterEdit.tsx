@@ -87,7 +87,7 @@ export default function WindmillMasterEdit() {
         if (status === 401 || tokenExpired) {
             localStorage.removeItem("access_token");
             alert("Session expired. Please log in again.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return true;
         }
         return false;
@@ -353,7 +353,7 @@ export default function WindmillMasterEdit() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             alert("Not authenticated – please log in first.");
-            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
+            navigate("/login");
             return;
         }
 
@@ -455,11 +455,11 @@ export default function WindmillMasterEdit() {
 
                 alert(isSubmitted ? "Windmill posted successfully" : "Windmill updated successfully");
                 if (isSubmitted) {
-                    navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill`);
+                    navigate("/master/windmill");
                 } else {
                     // After uploads tab, return to list; otherwise move to next tab
                     if (activeTab === "uploads") {
-                        navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill`);
+                        navigate("/master/windmill");
                     } else {
                         setActiveTab((prev) => {
                             const tabOrder = ["windmill_details", "uploads", "shift_timings"];
@@ -535,7 +535,7 @@ export default function WindmillMasterEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill`)}
+                            onClick={() => navigate("/master/windmill")}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

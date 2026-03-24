@@ -172,7 +172,7 @@ export default function EBStatementList() {
                             <Button onClick={handleSearch} size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-4">
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement/add`)}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate("/eb-statement/add")}>
                                 + New
                             </Button>
                             <Button size="sm" className="h-9 text-sm bg-red-600 hover:bg-red-700 text-white px-4" onClick={() => {
