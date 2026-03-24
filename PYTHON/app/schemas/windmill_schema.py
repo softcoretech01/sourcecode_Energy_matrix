@@ -15,6 +15,7 @@ class WindmillCreate(BaseModel):
     edc_circle_id: Optional[int] = None
     kva_id: int
     windmill_capacity: Optional[float] = None
+    transmission_loss: Optional[float] = None
     capacity_id: Optional[int] = None
 
     ae_name: Optional[str] = None
