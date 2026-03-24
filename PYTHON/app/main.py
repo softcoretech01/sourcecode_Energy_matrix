@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI):
     yield
     print("Application shutdown.")
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, redirect_slashes=False)
 
 # Allow frontend access
 app.add_middleware(
