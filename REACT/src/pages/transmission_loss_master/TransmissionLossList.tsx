@@ -271,7 +271,7 @@ const handleExportExcel = () => {
                             <Button size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-4" onClick={handleSearch}>
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate("/master/transmission-loss/add")}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss/add`)}>
                                 + New
                             </Button>
                            <Button
@@ -364,7 +364,7 @@ const handleExportExcel = () => {
   variant="ghost"
   size="icon"
   className="h-6 w-6 text-primary hover:text-primary hover:bg-primary/10"
-  onClick={() => navigate(`/master/transmission-loss/edit/${row.id}`)}
+  onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss/edit/${row.id}`)}
   disabled={row.is_submitted === 1}
 title={row.is_submitted === 1 ? "Cannot edit posted record" : "Edit"}
 >

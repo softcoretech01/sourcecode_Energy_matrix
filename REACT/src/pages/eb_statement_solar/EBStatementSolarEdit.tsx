@@ -71,7 +71,7 @@ export default function EBStatementSolarEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/eb-statement-solar")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

@@ -13,7 +13,7 @@ export default function InvestorsAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             alert("Not authenticated");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return;
         }
 
@@ -46,7 +46,7 @@ export default function InvestorsAdd() {
                 if (res.status === 401 || message === "Token expired") {
                     localStorage.removeItem("access_token");
                     alert("Session expired. Redirecting to login.");
-                    navigate("/login");
+                    navigate(`${import.meta.env.VITE_BASE_URL}/login`);
                     return;
                 }
                 throw new Error(message);
@@ -57,13 +57,13 @@ export default function InvestorsAdd() {
             } else {
                 alert("Investor saved successfully");
             }
-            navigate("/master/investors");
+            navigate(`${import.meta.env.VITE_BASE_URL}/master/investors`);
         } catch (error) {
             console.error(error);
             const errMsg = (error as Error).message || "Error saving investor";
             if (errMsg === "Token expired") {
                 localStorage.removeItem("access_token");
-                navigate("/login");
+                navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             } else {
                 alert(errMsg);
             }
@@ -99,7 +99,7 @@ export default function InvestorsAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate("/master/investors")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/investors`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

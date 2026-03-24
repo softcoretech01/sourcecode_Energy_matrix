@@ -160,7 +160,7 @@ export default function WindmillMasterAdd() {
         if (status === 401 || tokenExpired) {
             localStorage.removeItem("access_token");
             alert("Session expired. Please log in again.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return true;
         }
         return false;
@@ -210,7 +210,7 @@ export default function WindmillMasterAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             alert("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return;
         }
 
@@ -306,7 +306,7 @@ export default function WindmillMasterAdd() {
 
                 // If submitted (posted), go to list; otherwise advance to next tab
                 if (isSubmitted) {
-                    navigate("/master/windmill");
+                    navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill`);
                 } else {
                     // Advance to next tab
                     setActiveTab((prev) => {
@@ -370,7 +370,7 @@ export default function WindmillMasterAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/master/windmill")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/windmill`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

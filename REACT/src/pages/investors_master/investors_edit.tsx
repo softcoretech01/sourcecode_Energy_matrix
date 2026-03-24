@@ -17,7 +17,7 @@ export default function InvestorsEdit() {
         if (statusCode === 401 || tokenExpired) {
             localStorage.removeItem("access_token");
             alert("Session expired. Please log in again.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return true;
         }
         return false;
@@ -28,7 +28,7 @@ export default function InvestorsEdit() {
 
         const token = localStorage.getItem("access_token");
         if (!token) {
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return;
         }
 
@@ -65,7 +65,7 @@ export default function InvestorsEdit() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             alert("Not authenticated");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return;
         }
 
@@ -112,13 +112,13 @@ export default function InvestorsEdit() {
                 }
 
                 alert("Investor posted successfully");
-                navigate("/master/investors");
+                navigate(`${import.meta.env.VITE_BASE_URL}/master/investors`);
                 return;
             }
 
             alert("Investor updated successfully");
             setIsPosted(false);
-            navigate("/master/investors");
+            navigate(`${import.meta.env.VITE_BASE_URL}/master/investors`);
         } catch (error) {
             console.error(error);
             alert((error as Error).message || "Error updating investor");
@@ -152,7 +152,7 @@ export default function InvestorsEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate("/master/investors")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/investors`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

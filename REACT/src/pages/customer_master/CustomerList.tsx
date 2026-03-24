@@ -229,7 +229,7 @@ export default function CustomerList() {
                             <Button size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-4" onClick={handleSearch}>
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate("/master/customers/add")}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/customers/add`)}>
                                 + New
                             </Button>
                             <Button size="sm" className="h-9 text-sm bg-[#DAA520] hover:bg-[#B8860B] text-white px-4" onClick={handleExport}>
@@ -319,7 +319,7 @@ export default function CustomerList() {
                                                                 (row.is_submitted === 1 || row.status === "Posted" || row.status === 1) && "opacity-50 cursor-not-allowed"
                                                             )} 
                                                             disabled={row.is_submitted === 1 || row.status === "Posted" || row.status === 1}
-                                                            onClick={() => { console.log('Edit clicked:', row); navigate(`/master/customers/edit/${row.id}`); }}
+                                                            onClick={() => { console.log('Edit clicked:', row); navigate(`${import.meta.env.VITE_BASE_URL}/master/customers/edit/${row.id}`); }}
                                                             title={(row.is_submitted === 1 || row.status === "Posted" || row.status === 1) ? "Posted records cannot be edited" : "Edit Customer"}
                                                         >
                                                             <Edit className="h-4 w-4" />

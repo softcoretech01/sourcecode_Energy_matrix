@@ -77,7 +77,7 @@ export default function ShareHoldingsEdit() {
                 is_submitted: 0,
             });
 
-            navigate("/master/share-holdings");
+            navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`);
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             console.error((error as any)?.response?.data || error);
@@ -95,7 +95,7 @@ export default function ShareHoldingsEdit() {
                 is_submitted: 1,
             });
 
-            navigate("/master/share-holdings");
+            navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`);
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             console.error((error as any)?.response?.data || error);
@@ -127,7 +127,7 @@ export default function ShareHoldingsEdit() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/master/share-holdings")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/share-holdings`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

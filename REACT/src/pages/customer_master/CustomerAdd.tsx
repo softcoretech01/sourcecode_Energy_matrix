@@ -201,7 +201,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return false;
         }
         const payload: any = {
@@ -259,7 +259,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return false;
         }
         // Use remembered customer ID if available
@@ -310,7 +310,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return false;
         }
         // Use remembered customer ID if available
@@ -346,7 +346,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return false;
         }
         const customerId = createdCustomerId;
@@ -407,7 +407,7 @@ export default function CustomerAdd() {
         const token = localStorage.getItem("access_token");
         if (!token) {
             toast.error("Not authenticated – please log in first.");
-            navigate("/login");
+            navigate(`${import.meta.env.VITE_BASE_URL}/login`);
             return false;
         }
         let customerId = createdCustomerId;
@@ -473,7 +473,7 @@ export default function CustomerAdd() {
 
             if (res.ok) {
                 toast.success("Customer posted successfully!");
-                navigate("/master/customers");
+                navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`);
             } else {
                 const text = await res.text();
                 toast.error("Failed to post customer: " + text);
@@ -528,7 +528,7 @@ export default function CustomerAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate("/master/customers")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/customers`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

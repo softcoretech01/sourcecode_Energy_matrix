@@ -182,7 +182,7 @@ const handleExportExcel = () => {
                             <Button size="sm" className="h-9 text-sm bg-primary hover:bg-primary/90 text-primary-foreground px-4" onClick={handleSearch}>
                                 Search
                             </Button>
-                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate("/master/email/add")}>
+                            <Button size="sm" className="h-9 text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-4" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/email/add`)}>
                                 + New
                             </Button>
                             <Button
@@ -292,7 +292,7 @@ const handleExportExcel = () => {
                                                                 ? "text-gray-400 cursor-not-allowed"
                                                                 : "text-primary hover:text-primary hover:bg-primary/10"
                                                             )}
-                                                            onClick={() => navigate(`/master/email/edit/${row.id}`)}
+                                                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/email/edit/${row.id}`)}
                                                             title={row.is_submitted === 1 ? "Cannot edit posted record" : "Edit email"}
                                                         >
                                                             <Edit className="h-4 w-4" />

@@ -78,7 +78,7 @@ const handleSave = async () => {
 
     await api.post("/daily-generation/save", payload);
     toast({ title: "Saved", description: "Windmill transaction saved successfully." });
-    navigate("/windmill");
+    navigate(`${import.meta.env.VITE_BASE_URL}/windmill`);
   } catch (error: any) {
     console.error("Save failed", error);
     toast({ title: "Save failed", description: error?.response?.data?.detail || "Unable to save record." , variant: "destructive" });
@@ -110,7 +110,7 @@ const handlePost = async () => {
 
     await api.post("/daily-generation/post", payload);
     toast({ title: "Posted", description: "Windmill transaction posted successfully." });
-    navigate("/windmill");
+    navigate(`${import.meta.env.VITE_BASE_URL}/windmill`);
   } catch (error: any) {
     console.error("Post failed", error);
     toast({ title: "Post failed", description: error?.response?.data?.detail || "Unable to post record." , variant: "destructive" });
@@ -146,7 +146,7 @@ const handlePost = async () => {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/windmill")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

@@ -91,7 +91,7 @@ export default function ActualsAdd() {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/windmill/actuals")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill/actuals`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
@@ -169,7 +169,7 @@ export default function ActualsAdd() {
                         <div className="flex justify-center">
                             <Button
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => navigate("/windmill/actuals/pdf")}
+                                onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/windmill/actuals/pdf`)}
                             >
                                 Upload and Read PDF
                             </Button>

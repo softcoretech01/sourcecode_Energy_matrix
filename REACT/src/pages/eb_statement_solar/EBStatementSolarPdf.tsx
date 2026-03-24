@@ -188,7 +188,7 @@ export default function EBStatementSolarPdf() {
             };
             sessionStorage.setItem("ebStatementSolarLastSaved", JSON.stringify(savedRow));
 
-            navigate(`/eb-statement-solar`);
+            navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar`);
         } catch (err: unknown) {
             console.error(err);
             const message = err && typeof err === "object" && "message" in err ? String((err as { message?: string }).message) : "Failed to save EB statement.";
@@ -219,7 +219,7 @@ export default function EBStatementSolarPdf() {
                 <FileText className="h-12 w-12 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">Statement data not found</h2>
                 <p className="text-sm text-slate-500">No valid parsed statement data was found (detail/error entries are ignored).</p>
-                <Button onClick={() => navigate("/eb-statement-solar")}>Go Back</Button>
+                <Button onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar`)}>Go Back</Button>
             </div>
         );
     }
@@ -229,7 +229,7 @@ export default function EBStatementSolarPdf() {
             <div className="mx-auto max-w-5xl space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Button variant="ghost" onClick={() => navigate("/eb-statement-solar") }>
+                        <Button variant="ghost" onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/eb-statement-solar`) }>
                             <ArrowLeft className="mr-2 h-4 w-4" /> Back
                         </Button>
                         <h1 className="text-2xl font-bold text-slate-900">EB Statement - Solar</h1>

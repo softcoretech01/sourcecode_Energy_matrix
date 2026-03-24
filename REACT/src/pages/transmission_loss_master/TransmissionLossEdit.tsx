@@ -60,7 +60,7 @@ export default function TransmissionLossEdit() {
 
     
 
-            navigate("/master/transmission-loss");
+            navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss`);
 
         } catch (err) {
             console.error("Update failed", err);
@@ -97,7 +97,7 @@ export default function TransmissionLossEdit() {
                         <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => navigate("/master/transmission-loss")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/transmission-loss`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

@@ -91,7 +91,7 @@ const fetchConsumption = async () => {
 
     await api.put(`/consumption/update/${id}`, payload);
 
-    navigate("/master/consumption-charges");
+    navigate(`${import.meta.env.VITE_BASE_URL}/master/consumption-charges`);
 
   } catch (error) {
     console.error(error);
@@ -115,7 +115,7 @@ const fetchConsumption = async () => {
 
     await api.put(`/consumption/update/${id}`, payload);
 
-    navigate("/master/consumption-charges");
+    navigate(`${import.meta.env.VITE_BASE_URL}/master/consumption-charges`);
 
   } catch (error) {
     console.error(error);
@@ -148,7 +148,7 @@ const fetchConsumption = async () => {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0"
-                            onClick={() => navigate("/master/consumption-charges")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/consumption-charges`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>

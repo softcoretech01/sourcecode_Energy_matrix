@@ -46,7 +46,7 @@ const handleSave = async () => {
     });
 
     
-    navigate("/master/email");
+    navigate(`${import.meta.env.VITE_BASE_URL}/master/email`);
 
   } catch (error) {
     console.error("Save failed:", error.response?.data);
@@ -63,7 +63,7 @@ const handlePost = async () => {
     });
 
    
-    navigate("/master/email");
+    navigate(`${import.meta.env.VITE_BASE_URL}/master/email`);
 
   } catch (error) {
     console.error("Post failed:", error);
@@ -96,7 +96,7 @@ const handlePost = async () => {
                             size="sm"
                             variant="outline"
                             className="text-slate-600 border-slate-300 bg-white hover:bg-slate-50 h-8 w-8 p-0 rounded-md transition-all"
-                            onClick={() => navigate("/master/email")}
+                            onClick={() => navigate(`${import.meta.env.VITE_BASE_URL}/master/email`)}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
