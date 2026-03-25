@@ -1,58 +1,20 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: energymatrix-db-uat
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "Ener9y#8154"
-      MYSQL_DATABASE: energy_matrices
-    ports:
-      - "3309:3306"
-    volumes:
-      - db-data:/var/lib/mysql
-    networks:
-      - energy-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
-
   backend:
-    build:
-      context: ./PYTHON
-      dockerfile: Dockerfile
-    container_name: energymatrix-backend-uat
-    ports:
-      - "3002:3000"
-    env_file:
-      - ./PYTHON/.env
+    build: ./PYTHON
+    container_name: backend
     restart: always
+    expose:
+      - "8000"
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "8080:80"
     volumes:
-      - ./PYTHON/uploads:/app/uploads
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - energy-network
-
-  frontend:
-    build:
-      context: ./REACT
-      dockerfile: Dockerfile
-    container_name: energymatrix-frontend-uat
-    ports:
-      - "8002:80"
-    restart: always
+      - ./REACT/dist:/usr/share/nginx/html/energymatrix/uat
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
-    networks:
-      - energy-network
-
-volumes:
-  db-data:
-
-networks:
-  energy-network:
-    driver: bridge

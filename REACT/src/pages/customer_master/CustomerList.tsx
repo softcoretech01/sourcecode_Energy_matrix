@@ -41,7 +41,7 @@ export default function CustomerList() {
     const loadCustomers = async () => {
         try {
             const token = localStorage.getItem("access_token");
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/customers/`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/customers`, {
                 headers: {
                     "Content-Type": "application/json",
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),

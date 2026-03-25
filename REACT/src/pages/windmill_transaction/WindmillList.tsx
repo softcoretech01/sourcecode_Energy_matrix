@@ -111,7 +111,7 @@ const handleDelete = async (id) => {
 
 const fetchGeneration = async () => {
   try {
-    const response = await api.get("/daily-generation", {
+    const response = await api.get("/daily-generation/", {
       params: {
         from_date: formatDateForAPI(fromDate),
         to_date: formatDateForAPI(toDate),
