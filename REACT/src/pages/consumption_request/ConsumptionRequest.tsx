@@ -269,8 +269,12 @@ export default function ConsumptionRequest() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Customers</SelectItem>
-                                    {Array.from(new Set(customers.map(c => c.customer_name))).map(name => (
-                                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                                    {Array.from(
+                                        new Map(customers.map(c => [c.customer_id, c])).values()
+                                    ).map(c => (
+                                        <SelectItem key={c.customer_id} value={c.customer_name}>
+                                            {c.customer_name}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -368,8 +372,7 @@ export default function ConsumptionRequest() {
                                             <TableCell className="py-2 text-sm text-slate-700">{row.sc_number}</TableCell>
                                             <TableCell className="py-2 p-1">
                                                 <Input
-                                                    disabled={!isEditing}
-                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white disabled:bg-slate-50 disabled:text-slate-500"
+                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white"
                                                     value={row.c1}
                                                     onFocus={() => handleFocus(row.service_id, 'c1')}
                                                     onBlur={(e) => handleBlur(row.service_id, 'c1', e.target.value)}
@@ -378,8 +381,7 @@ export default function ConsumptionRequest() {
                                             </TableCell>
                                             <TableCell className="py-2 p-1">
                                                 <Input
-                                                    disabled={!isEditing}
-                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white disabled:bg-slate-50 disabled:text-slate-500"
+                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white"
                                                     value={row.c2}
                                                     onFocus={() => handleFocus(row.service_id, 'c2')}
                                                     onBlur={(e) => handleBlur(row.service_id, 'c2', e.target.value)}
@@ -389,8 +391,7 @@ export default function ConsumptionRequest() {
 
                                             <TableCell className="py-2 p-1">
                                                 <Input
-                                                    disabled={!isEditing}
-                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white disabled:bg-slate-50 disabled:text-slate-500"
+                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white"
                                                     value={row.c4}
                                                     onFocus={() => handleFocus(row.service_id, 'c4')}
                                                     onBlur={(e) => handleBlur(row.service_id, 'c4', e.target.value)}
@@ -399,8 +400,7 @@ export default function ConsumptionRequest() {
                                             </TableCell>
                                             <TableCell className="py-2 p-1">
                                                 <Input
-                                                    disabled={!isEditing}
-                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white disabled:bg-slate-50 disabled:text-slate-500"
+                                                    className="h-8 text-right text-sm border-slate-200 shadow-none focus-visible:ring-1 bg-white"
                                                     value={row.c5}
                                                     onFocus={() => handleFocus(row.service_id, 'c5')}
                                                     onBlur={(e) => handleBlur(row.service_id, 'c5', e.target.value)}

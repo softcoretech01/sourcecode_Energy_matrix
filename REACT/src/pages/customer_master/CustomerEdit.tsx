@@ -179,6 +179,7 @@ export default function CustomerEdit(): JSX.Element {
     const [newEdcCircle, setNewEdcCircle] = useState("");
     const [newSeRemarks, setNewSeRemarks] = useState("");
     const [newSeStatus, setNewSeStatus] = useState("active");
+    const [newPerCostUnit, setNewPerCostUnit] = useState("");
     const [editSeId, setEditSeId] = useState<number | null>(null);
     const [edcList, setEdcList] = useState<{ id: number; edc_name?: string; edc_circle?: string }[]>([]);
     const [kvaList, setKvaList] = useState<{ id: number; kva?: string; capacity?: string }[]>([]);
@@ -277,6 +278,7 @@ export default function CustomerEdit(): JSX.Element {
                     status: newSeStatus === "active" ? 1 : 0,
                     remarks: newSeRemarks,
                     is_submitted: true,
+                    per_cost_unit: newPerCostUnit ? parseFloat(newPerCostUnit) : null,
                 };
                 const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/customers/${id}/se/${editSeId}`, {
                     method: "PUT",
@@ -361,6 +363,7 @@ export default function CustomerEdit(): JSX.Element {
         setNewEdcCircle("");
         setNewSeRemarks("");
         setNewSeStatus("active");
+        setNewPerCostUnit("");
     };
 
     const handleAddContact = async () => {
@@ -570,7 +573,8 @@ export default function CustomerEdit(): JSX.Element {
                     edc_circle: se.edcCircle ?? se.edc_circle_id ?? se.edc_circle,
                     status: se.status === "active" || se.status === 1 || se.status === "1" ? 1 : 0,
                     remarks: se.remarks,
-                    is_submitted: isPosting ? 1 : 0
+                    is_submitted: isPosting ? 1 : 0,
+                    per_cost_unit: (se as any).per_cost_unit ?? (se as any).perCostUnit ?? null,
                 };
                 const seRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/customers/${id}/se`, {
                     method: "POST",
@@ -862,7 +866,8 @@ export default function CustomerEdit(): JSX.Element {
                             <TabsContent value="se_number" className="mt-0 space-y-6 pt-2">
                                 <div className="space-y-6 max-w-4xl">
                                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                        <div className="md:col-span-3 space-y-2">
+                                        {/* Row 1: all main fields */}
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">Service Number</label>
                                             <Input
                                                 value={newSeNumber}
@@ -872,7 +877,7 @@ export default function CustomerEdit(): JSX.Element {
                                                 disabled={isPosted}
                                             />
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">KVA</label>
                                             <Select value={newKva} onValueChange={setNewKva} disabled={isPosted}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -892,7 +897,7 @@ export default function CustomerEdit(): JSX.Element {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">EDC Circle</label>
                                             <Select value={newEdcCircle} onValueChange={setNewEdcCircle} disabled={isPosted}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -913,7 +918,7 @@ export default function CustomerEdit(): JSX.Element {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">Status</label>
                                             <Select value={newSeStatus} onValueChange={setNewSeStatus} disabled={isPosted}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -925,26 +930,38 @@ export default function CustomerEdit(): JSX.Element {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-12 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
+                                            <label className="text-sm font-semibold text-slate-700">Per Cost Unit (₹)</label>
+                                            <Input
+                                                type="number"
+                                                value={newPerCostUnit}
+                                                onChange={(e) => setNewPerCostUnit(e.target.value)}
+                                                placeholder="e.g. 5.50"
+                                                className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                                disabled={isPosted}
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2 flex items-end">
+                                            <Button
+                                                onClick={handleAddSeNumber}
+                                                className={cn("w-full bg-cyan-700 hover:bg-cyan-800 text-white h-10 gap-2", isPosted && "opacity-50 cursor-not-allowed")}
+                                                disabled={isPosted}
+                                            >
+                                                <UserPlus className="h-4 w-4" /> Add
+                                            </Button>
+                                        </div>
+                                        {/* Row 2: Remarks — compact */}
+                                        <div className="md:col-span-5 space-y-1">
                                             <label className="text-sm font-semibold text-slate-700">Remarks</label>
                                             <Input
                                                 value={newSeRemarks}
                                                 onChange={(e) => setNewSeRemarks(e.target.value)}
                                                 placeholder="Enter Remarks"
                                                 maxLength={50}
-                                                className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
+                                                className="bg-white border-slate-300 h-9 text-sm focus:ring-blue-500"
                                                 disabled={isPosted}
                                             />
-                                            <div className="text-right text-xs text-slate-500">{newSeRemarks.length}/50</div>
-                                        </div>
-                                        <div className="md:col-span-12 flex justify-end pt-2">
-                                            <Button
-                                                onClick={handleAddSeNumber}
-                                                className={cn("bg-cyan-700 hover:bg-cyan-800 text-white gap-2", isPosted && "opacity-50 cursor-not-allowed")}
-                                                disabled={isPosted}
-                                            >
-                                                <UserPlus className="h-4 w-4" /> Add
-                                            </Button>
+                                            <div className="text-right text-xs text-slate-400">{newSeRemarks.length}/50</div>
                                         </div>
                                     </div>
 
@@ -956,6 +973,7 @@ export default function CustomerEdit(): JSX.Element {
                                                     <th className="px-4 py-3 border-r border-slate-200">SE Number</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">KVA</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">EDC Circle</th>
+                                                    <th className="px-4 py-3 border-r border-slate-200">Per Cost Unit (₹)</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">Remarks</th>
                                                 </tr>
                                             </thead>
@@ -993,6 +1011,9 @@ export default function CustomerEdit(): JSX.Element {
                                                                     item.edcCircle ||
                                                                     ""}
                                                             </td>
+                                                            <td className="px-4 py-3 text-slate-600 border-r border-slate-100">
+                                                                {(item as any).per_cost_unit ?? "—"}
+                                                            </td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100">{item.remarks}</td>
                                                             <td className="px-4 py-3 text-center flex justify-center gap-2">
                                                                 <Button
@@ -1010,6 +1031,7 @@ export default function CustomerEdit(): JSX.Element {
                                                                             (item.edc_circle_id ?? item.edc_circle ?? item.edcCircle)?.toString() || ""
                                                                         );
                                                                         setNewSeRemarks(item.remarks || "");
+                                                                        setNewPerCostUnit((item as any).per_cost_unit?.toString() || "");
                                                                         setNewSeStatus(
                                                                             item.status === 1 ||
                                                                                 item.status === "1" ||

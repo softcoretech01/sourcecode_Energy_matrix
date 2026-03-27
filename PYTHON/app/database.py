@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from urllib.parse import quote_plus
+
 load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "3306"))
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_NAME = os.getenv("DB_NAME", "masters")
@@ -24,15 +24,15 @@ db_password_escaped = quote_plus(DB_PASSWORD)
 
 # SQLAlchemy Engines & Session configuration
 engine_masters = create_engine(
-    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
+    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}/{DB_NAME}",
     connect_args={"connect_timeout": CONNECT_TIMEOUT, "read_timeout": READ_TIMEOUT}
 )
 engine_windmill = create_engine(
-    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}:{DB_PORT}/{DB_NAME_WINDMILL}",
+    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}/{DB_NAME_WINDMILL}",
     connect_args={"connect_timeout": CONNECT_TIMEOUT, "read_timeout": READ_TIMEOUT}
 )
 engine_solar = create_engine(
-    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}:{DB_PORT}/{DB_NAME_SOLAR}",
+    f"mysql+pymysql://{DB_USER}:{db_password_escaped}@{DB_HOST}/{DB_NAME_SOLAR}",
     connect_args={"connect_timeout": CONNECT_TIMEOUT, "read_timeout": READ_TIMEOUT}
 )
 
@@ -68,7 +68,6 @@ def get_connection(db_name=None):
         db_name = DB_NAME
     return pymysql.connect(
         host=DB_HOST,
-        port=DB_PORT,
         user=DB_USER,
         password=DB_PASSWORD,
         database=db_name,
@@ -84,7 +83,6 @@ def initialize_database():
     try:
         init_conn = pymysql.connect(
             host=DB_HOST, 
-            port=DB_PORT,
             user=DB_USER, 
             password=DB_PASSWORD, 
             autocommit=True,
@@ -101,11 +99,9 @@ def initialize_database():
     except Exception as e:
         print(f"Failed to ensure databases on startup: {e}")
 
-
-   
     # IMPORT all models here to register them with metadata
     from app.models import customer_masters, master_models, windmill_masters, windmill_models
-
+    
     # 1. Create all Tables based on defined models
     print("Creating SQLAlchemy tables for Masters...")
     BaseMasters.metadata.create_all(bind=engine_masters)
@@ -156,16 +152,38 @@ def initialize_database():
                             statements = content.split(delimiter)
                             
                             for statement in statements:
-                                clean_statement = statement.strip()
+                                raw_statement = statement.strip()
+                                if not raw_statement:
+                                    continue
+
                                 # Remove any trailing delimiter character that might have been missed
-                                if clean_statement.endswith(';'):
-                                    clean_statement = clean_statement[:-1].strip()
-                                
-                                if clean_statement:
-                                    try:
-                                        cursor.execute(clean_statement)
-                                    except Exception as e:
-                                        print(f"Error executing SP from {filename} in {db_to_init}: {e}")
+                                if raw_statement.endswith(';'):
+                                    raw_statement = raw_statement[:-1].strip()
+
+                                if not raw_statement:
+                                    continue
+
+                                # Some statements may include a DROP and CREATE together (e.g., DROP PROCEDURE; CREATE PROCEDURE;)
+                                # when a custom delimiter is used. Execute them as separate SQL commands to avoid one-query syntax errors.
+                                if 'CREATE PROCEDURE' in raw_statement.upper() and 'DROP PROCEDURE' in raw_statement.upper():
+                                    upper_raw = raw_statement.upper()
+                                    create_idx = upper_raw.find('CREATE PROCEDURE')
+                                    drop_stmt = raw_statement[:create_idx].strip().rstrip(';').strip()
+                                    create_stmt = raw_statement[create_idx:].strip().rstrip(';').strip()
+
+                                    for stmt in (drop_stmt, create_stmt):
+                                        if not stmt:
+                                            continue
+                                        try:
+                                            cursor.execute(stmt)
+                                        except Exception as e:
+                                            print(f"Error executing SP from {filename} in {db_to_init}: {e}")
+                                    continue
+
+                                try:
+                                    cursor.execute(raw_statement)
+                                except Exception as e:
+                                    print(f"Error executing SP from {filename} in {db_to_init}: {e}")
                 conn.commit()
                 cursor.close()
                 conn.close()

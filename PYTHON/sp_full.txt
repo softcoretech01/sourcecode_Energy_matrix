@@ -1,0 +1,30 @@
+=== get_eb_bill_customers ===
+BEGIN
+            SELECT DISTINCT mc.id, mc.customer_name 
+            FROM masters.master_customers mc
+            WHERE mc.status = "Active" AND mc.is_submitted = 1
+            ORDER BY mc.customer_name;
+        END
+
+=== get_eb_bill_service_number ===
+BEGIN
+            SELECT id, service_number 
+            FROM masters.customer_service 
+            WHERE customer_id = cust_id AND status = "Active"
+            ORDER BY service_number;
+        END
+
+=== masters.master_customers columns ===
+('id', 'int', 'NO', 'PRI', None, 'auto_increment')
+('customer_name', 'varchar(255)', 'YES', '', None, '')
+('city', 'varchar(50)', 'YES', '', None, '')
+('phone_no', 'varchar(50)', 'YES', '', None, '')
+('email', 'varchar(150)', 'YES', '', None, '')
+('address', 'varchar(100)', 'YES', '', None, '')
+('gst_number', 'varchar(50)', 'YES', '', None, '')
+('status', 'varchar(1)', 'YES', '', None, '')
+('created_by', 'int', 'YES', '', None, '')
+('created_at', 'datetime', 'YES', '', None, '')
+('modified_by', 'int', 'YES', '', None, '')
+('modified_at', 'datetime', 'YES', '', None, '')
+('is_submitted', 'smallint', 'YES', '', None, '')

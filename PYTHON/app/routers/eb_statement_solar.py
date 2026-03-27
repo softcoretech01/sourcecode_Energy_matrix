@@ -111,7 +111,8 @@ async def get_solar_windmill_numbers():
     cursor = conn.cursor()
 
     try:
-        cursor.callproc("sp_get_solar_windmill_numbers")
+        # Filter by type = 'Solar' and posted status to show only active records
+        cursor.execute("SELECT id, windmill_number FROM masters.master_windmill WHERE LOWER(type) = 'solar' AND is_submitted = 1 ORDER BY windmill_number")
         rows = cursor.fetchall()
         data = [
             {"id": row[0], "solar_number": row[1]}
@@ -534,7 +535,7 @@ async def read_eb_statement_solar_pdf(
 
     # parse using shared extractor from windmill EB statement module (validate service number vs solar number)
     try:
-        parsed_data = extract_eb_statement_data(file_path, expected_wm)
+        parsed_data = extract_eb_statement_data(file_path, expected_wm, year, month)
     except Exception as parse_err:
         # clean up uploaded file if validation failed
         try:

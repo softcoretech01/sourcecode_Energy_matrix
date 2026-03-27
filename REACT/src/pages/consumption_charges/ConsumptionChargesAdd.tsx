@@ -29,10 +29,10 @@ export default function ConsumptionChargesAdd() {
     const [type, setType] = React.useState<string>("");
     const [showFormula, setShowFormula] = React.useState<boolean>(false);
     const [energy, setEnergy] = React.useState("windmill");
-const [chargeCode, setChargeCode] = React.useState("");
-const [chargeName, setChargeName] = React.useState("");
-const [description, setDescription] = React.useState("");
-const [discount, setDiscount] = React.useState("50");
+    const [chargeCode, setChargeCode] = React.useState("");
+    const [chargeName, setChargeName] = React.useState("");
+    const [description, setDescription] = React.useState("");
+    const [discount, setDiscount] = React.useState("50");
 
     const getUomLabel = (val: string) => {
         if (val === "per_unit") return "unit";
@@ -47,29 +47,29 @@ const [discount, setDiscount] = React.useState("50");
 
 
     const handleSubmit = async (isSubmitted: number) => {
-    try {
-        const payload = {
-            energy_type: energy,
-            charge_code: chargeCode,
-            charge_name: chargeName,
-            cost: Number(cost),
-            uom: uom,
-            type: type,
-            charge_description: description || null,
-            valid_upto: date ? format(date, "yyyy-MM-dd") : null,
-            discount_charges: 50,
-            is_submitted: isSubmitted, // 🔥 0 = Save, 1 = Post
-        };
+        try {
+            const payload = {
+                energy_type: energy,
+                charge_code: chargeCode,
+                charge_name: chargeName,
+                cost: Number(cost),
+                uom: uom,
+                type: type,
+                charge_description: description || null,
+                valid_upto: date ? format(date, "yyyy-MM-dd") : null,
+                discount_charges: 50,
+                is_submitted: isSubmitted, // 🔥 0 = Save, 1 = Post
+            };
 
-        await api.post("/consumption/add", payload);
+            await api.post("/consumption/add", payload);
 
-        navigate("/master/consumption-charges");
+            navigate("/master/consumption-charges");
 
-    } catch (error: any) {
-        console.error(error);
-        alert(error?.response?.data?.detail || "Something went wrong");
-    }
-};
+        } catch (error: any) {
+            console.error(error);
+            alert(error?.response?.data?.detail || "Something went wrong");
+        }
+    };
 
     return (
         <div className="p-3 bg-slate-50 min-h-screen font-sans">
@@ -80,20 +80,20 @@ const [discount, setDiscount] = React.useState("50");
                         Consumption Charges - Add
                     </h1>
                     <div className="flex gap-2">
-                       <Button
-    size="sm"
-    className="bg-red-600 hover:bg-red-700 text-white h-8 px-4"
-    onClick={() => handleSubmit(0)} // ✅ SAVE
->
-    Save
-</Button>
                         <Button
-    size="sm"
-    className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4"
-    onClick={() => handleSubmit(1)} // ✅ POST
->
-    Post
-</Button>
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white h-8 px-4"
+                            onClick={() => handleSubmit(0)} // ✅ SAVE
+                        >
+                            Save
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4"
+                            onClick={() => handleSubmit(1)} // ✅ POST
+                        >
+                            Post
+                        </Button>
                         <Button
                             size="sm"
                             variant="outline"
@@ -112,43 +112,43 @@ const [discount, setDiscount] = React.useState("50");
                                 <label className="text-sm font-semibold text-slate-700">Energy</label>
                                 <div className="flex gap-4 items-center h-9">
                                     <label className="flex items-center gap-2 cursor-pointer">
-                                       <input
-  type="radio"
-  name="energy"
-  value="windmill"
-  checked={energy === "windmill"}
-  onChange={(e) => setEnergy(e.target.value)}
-/>
+                                        <input
+                                            type="radio"
+                                            name="energy"
+                                            value="windmill"
+                                            checked={energy === "windmill"}
+                                            onChange={(e) => setEnergy(e.target.value)}
+                                        />
 
                                         <span className="text-sm text-slate-700">Windmill</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
-                                       <input
-  type="radio"
-  name="energy"
-  value="solar"
-  checked={energy === "solar"}
-  onChange={(e) => setEnergy(e.target.value)}
-/>
+                                        <input
+                                            type="radio"
+                                            name="energy"
+                                            value="solar"
+                                            checked={energy === "solar"}
+                                            onChange={(e) => setEnergy(e.target.value)}
+                                        />
                                         <span className="text-sm text-slate-700">Solar</span>
                                     </label>
                                 </div>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700">Charge Code</label>
-                               <Input
-                               placeholder="Enter Change Code"
-  value={chargeCode}
-  onChange={(e) => setChargeCode(e.target.value)}
-/>
+                                <Input
+                                    placeholder="Enter Change Code"
+                                    value={chargeCode}
+                                    onChange={(e) => setChargeCode(e.target.value)}
+                                />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700">Charge Name</label>
                                 <Input
-                                placeholder="Enter Charge Name"
-  value={chargeName}
-  onChange={(e) => setChargeName(e.target.value)}
-/>
+                                    placeholder="Enter Charge Name"
+                                    value={chargeName}
+                                    onChange={(e) => setChargeName(e.target.value)}
+                                />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700">Cost</label>
@@ -184,10 +184,10 @@ const [discount, setDiscount] = React.useState("50");
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700">Charge Description</label>
                                 <Input
-                                placeholder="Enter Discription"
-  value={description}
-  onChange={(e) => setDescription(e.target.value)}
-/>
+                                    placeholder="Enter Discription"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-sm font-semibold text-slate-700">Valid upto</label>
@@ -239,24 +239,30 @@ const [discount, setDiscount] = React.useState("50");
                                 <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 inline-block animate-in fade-in zoom-in duration-200">
                                     <div className="flex items-center gap-6 text-sm">
                                         <span className="font-bold text-slate-700 uppercase tracking-widest text-xs">Formula</span>
-                                        <div className="flex flex-col items-center justify-center font-medium text-slate-800">
-                                            <div className="pb-2 border-b-2 border-slate-300 w-full text-center">
-                                                <span className="bg-white px-2 py-1 rounded shadow-sm border border-slate-200 mr-2">( ({costDisplay}) / 2 )</span>
-                                                <span className="mx-1 text-slate-500">×</span>
-                                                <span className="ml-2">365 <span className="text-xs text-slate-500 font-normal italic">(Days in a year)</span></span>
-                                                <span className="mx-2 text-slate-500">×</span>
-                                                <span className="text-slate-800">No. of days in a month</span>
+                                        {uom === "paisa" && type === "unit" ? (
+                                            <div className="font-medium text-slate-800 bg-white px-3 py-2 rounded shadow-sm border border-slate-200">
+                                                ( ({costDisplay}) / 2 ) / 100
                                             </div>
-                                            <div className="pt-2 text-center">
-                                                <span>Total units generated by windmill per month</span>
-                                                <span className="mx-2 text-slate-500">−</span>
-                                                <span className="text-slate-500 font-light">(</span>
-                                                <span>Total units generated by windmill per month</span>
-                                                <span className="mx-2 text-slate-500">×</span>
-                                                <span>Transmission Loss</span>
-                                                <span className="text-slate-500 font-light">)</span>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center font-medium text-slate-800">
+                                                <div className="pb-2 border-b-2 border-slate-300 w-full text-center">
+                                                    <span className="bg-white px-2 py-1 rounded shadow-sm border border-slate-200 mr-2">( ({costDisplay}) / 2 )</span>
+                                                    <span className="mx-1 text-slate-500">×</span>
+                                                    <span className="ml-2">365 <span className="text-xs text-slate-500 font-normal italic">(Days in a year)</span></span>
+                                                    <span className="mx-2 text-slate-500">×</span>
+                                                    <span className="text-slate-800">No. of days in a month</span>
+                                                </div>
+                                                <div className="pt-2 text-center">
+                                                    <span>Total units generated by windmill per month</span>
+                                                    <span className="mx-2 text-slate-500">−</span>
+                                                    <span className="text-slate-500 font-light">(</span>
+                                                    <span>Total units generated by windmill per month</span>
+                                                    <span className="mx-2 text-slate-500">×</span>
+                                                    <span>Transmission Loss</span>
+                                                    <span className="text-slate-500 font-light">)</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

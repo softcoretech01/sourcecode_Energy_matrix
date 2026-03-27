@@ -1,0 +1,22 @@
+=== get_active_windmill_numbers SP ===
+BEGIN
+            SELECT id, windmill_number 
+            FROM masters.master_windmill 
+            WHERE status = "Active" AND is_submitted = 1 
+            ORDER BY windmill_number;
+        END
+
+=== SP returned 9 rows ===
+  raw=3  stripped='3'
+  raw=4  stripped='4'
+  raw=6  stripped='6'
+  raw=9  stripped='9'
+  raw=7  stripped='7'
+  raw=5  stripped='5'
+  raw=8  stripped='8'
+  raw=2  stripped='2'
+  raw=10  stripped='10'
+
+
+Error masters.windmill_masters: (1146, "Table 'masters.windmill_masters' doesn't exist")
+DESCRIBE error: (1146, "Table 'masters.windmill_masters' doesn't exist")

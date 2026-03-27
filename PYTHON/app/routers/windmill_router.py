@@ -127,6 +127,27 @@ async def get_windmills(user: dict = Depends(get_current_user)):
 
 # -------------------------------------------------------
 # GET WINDMILL BY ID
+
+# -------------------------------------------------------
+# GET ACTIVE AND POSTED WINDMILLS FOR ENERGY ALLOTMENT
+# -------------------------------------------------------
+@router.get("/active-posted")
+async def get_active_posted_windmills(user: dict = Depends(get_current_user)):
+    from app.models.windmill_masters import Windmill
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        result = Windmill.get_active_posted_windmills(cursor)
+        return result
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# -------------------------------------------------------
+# GET WINDMILL BY ID
 # -------------------------------------------------------
 @router.get("/{windmill_id}")
 async def get_windmill(windmill_id: int, user: dict = Depends(get_current_user)):

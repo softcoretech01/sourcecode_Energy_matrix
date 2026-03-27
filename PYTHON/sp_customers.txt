@@ -1,0 +1,7 @@
+=== get_eb_bill_customers ===
+BEGIN
+            SELECT DISTINCT mc.id, mc.customer_name 
+            FROM masters.master_customers mc
+            WHERE mc.status = "Active" AND mc.is_submitted = 1
+            ORDER BY mc.customer_name;
+        END

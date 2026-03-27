@@ -12,6 +12,18 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      "/energymatrix/uat/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/energymatrix\/uat/, ""),
+      },
+      "/energymatrix/uat/uploads": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/energymatrix\/uat/, ""),
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

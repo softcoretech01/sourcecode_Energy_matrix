@@ -129,63 +129,63 @@ export function AppSidebar() {
             url: "#",
             icon: Fan,
             items: [
-                //{
-                //   title: "Dashboard",
-                //   url: "/",
-                //   icon: LayoutDashboard,
-                //},
+                {
+                    title: "Dashboard",
+                    url: "/",
+                    icon: LayoutDashboard,
+                },
                 {
                     title: "Daily Generation",
                     url: "/windmill",
                     icon: CloudSun,
                 },
-                //{
-                //   title: "EB Statement",
-                //   url: "/eb-statement",
-                //    icon: FileText,
-                //},
-                //{
-                //    title: "Cust Cons Req",
-                //    url: "/consumption-request",
-                //    icon: ClipboardList,
-                //},
-                //{
-                //   title: "Energy Allotment",
-                //   url: "/energy-allotment",
-                //    icon: Zap,
-                //},
-                //{
-                //    title: "Client EB Bill",
-                //    url: "/windmill/eb-bill",
-                //   icon: CreditCard,
-                //},
+                {
+                    title: "EB Statement",
+                    url: "/eb-statement",
+                    icon: FileText,
+                },
+                {
+                    title: "Cust Cons Req",
+                    url: "/consumption-request",
+                    icon: ClipboardList,
+                },
+                {
+                    title: "Energy Allotment",
+                    url: "/energy-allotment",
+                    icon: Zap,
+                },
+                {
+                    title: "Client EB Bill",
+                    url: "/windmill/eb-bill",
+                    icon: CreditCard,
+                },
 
-                //{
-                //    title: "Client Invoice",
-                //    url: "/windmill/client-invoice",
-                //    icon: ReceiptText,
-                //},
-                //{
-                //    title: "Actual Allotment",
-                //    url: "/windmill/actuals",
-                //    icon: CreditCard,
-                //},
+                {
+                    title: "Client Invoice",
+                    url: "/windmill/client-invoice",
+                    icon: ReceiptText,
+                },
+                {
+                    title: "Actual Allotment",
+                    url: "/windmill/actuals",
+                    icon: CreditCard,
+                },
 
 
             ]
         },
-        //{
-        //    title: "Solar",
-        //    url: "#",
-        //    icon: CloudSun,
-        //    items: [
-        //{
-        //    title: "EB Statement-Solar",
-        //    url: "/eb-statement-solar",
-        //    icon: CreditCard,
-        //},
-        //]
-        //},
+        {
+            title: "Solar",
+            url: "#",
+            icon: CloudSun,
+            items: [
+                {
+                    title: "EB Statement-Solar",
+                    url: "/eb-statement-solar",
+                    icon: CreditCard,
+                },
+            ]
+        },
         // {
         //     title: "SOP",
         //     url: "#",

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "@/services/api";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Search, Edit, Eye } from "lucide-react";
 import { toast } from "sonner";
@@ -23,15 +24,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const allotmentData = [
-    { wm: "WM-001", customer: "L&T", seNumber: "SC-1001", consumption: "600", c1: "250", c1_pp: "300", c1_bank: "110", c2: "100", c2_pp: "150", c2_bank: "50", c4: "75", c4_pp: "100", c4_bank: "40", c5: "50", c5_pp: "80", c5_bank: "30", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-002", customer: "Texmo", seNumber: "SC-2001", consumption: "525", c1: "200", c1_pp: "300", c1_bank: "120", c2: "90", c2_pp: "120", c2_bank: "40", c4: "70", c4_pp: "100", c4_bank: "30", c5: "45", c5_pp: "80", c5_bank: "20", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-003", customer: "L&T", seNumber: "SC-1002", consumption: "450", c1: "150", c1_pp: "200", c1_bank: "80", c2: "80", c2_pp: "120", c2_bank: "40", c4: "60", c4_pp: "90", c4_bank: "30", c5: "40", c5_pp: "70", c5_bank: "20", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-004", customer: "Texmo", seNumber: "SC-2002", consumption: "400", c1: "120", c1_pp: "180", c1_bank: "70", c2: "70", c2_pp: "100", c2_bank: "30", c4: "50", c4_pp: "80", c4_bank: "20", c5: "35", c5_pp: "60", c5_bank: "15", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-005", customer: "L&T", seNumber: "SC-1004", consumption: "500", c1: "180", c1_pp: "250", c1_bank: "90", c2: "85", c2_pp: "130", c2_bank: "45", c4: "65", c4_pp: "100", c4_bank: "35", c5: "45", c5_pp: "75", c5_bank: "25", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-006", customer: "Texmo", seNumber: "SC-2003", consumption: "480", c1: "160", c1_pp: "220", c1_bank: "85", c2: "75", c2_pp: "115", c2_bank: "35", c4: "55", c4_pp: "90", c4_bank: "25", c5: "40", c5_pp: "70", c5_bank: "20", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-007", customer: "L&T", seNumber: "SC-1001", consumption: "550", c1: "210", c1_pp: "280", c1_bank: "95", c2: "95", c2_pp: "140", c2_bank: "55", c4: "70", c4_pp: "110", c4_bank: "45", c5: "50", c5_pp: "85", c5_bank: "35", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "WM-008", customer: "Texmo", seNumber: "SC-2005", consumption: "620", c1: "240", c1_pp: "310", c1_bank: "110", c2: "105", c2_pp: "160", c2_bank: "60", c4: "80", c4_pp: "120", c4_bank: "50", c5: "55", c5_pp: "95", c5_bank: "40", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
-    { wm: "SOLAR-001", customer: "L&T", seNumber: "SC-1002", consumption: "420", c1: "140", c1_pp: "200", c1_bank: "75", c2: "65", c2_pp: "100", c2_bank: "35", c4: "45", c4_pp: "75", c4_bank: "25", c5: "30", c5_pp: "55", c5_bank: "15", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" }
+    { wm: "039224391798", customer: "L&T", seNumber: "SC-1001", consumption: "600", c1: "250", c1_pp: "300", c1_bank: "110", c2: "100", c2_pp: "150", c2_bank: "50", c4: "75", c4_pp: "100", c4_bank: "40", c5: "50", c5_pp: "80", c5_bank: "30", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
+    { wm: "039214391145", customer: "Texmo", seNumber: "SC-2001", consumption: "525", c1: "200", c1_pp: "300", c1_bank: "120", c2: "90", c2_pp: "120", c2_bank: "40", c4: "70", c4_pp: "100", c4_bank: "30", c5: "45", c5_pp: "80", c5_bank: "20", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
+    { wm: "059514500104", customer: "L&T", seNumber: "SC-1002", consumption: "450", c1: "150", c1_pp: "200", c1_bank: "80", c2: "80", c2_pp: "120", c2_bank: "40", c4: "60", c4_pp: "90", c4_bank: "30", c5: "40", c5_pp: "70", c5_bank: "20", c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0" },
 ];
 
 // Charge lookup: charges keyed by "customer|seNumber"
@@ -67,7 +62,7 @@ const initialSolarData = [
     { customer: "Texmo", seNumber: "SC-2005" },
 ];
 
-const windmillNumbers = ["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008"];
+
 
 type ChargeRow = {
     windmill: string;
@@ -83,11 +78,7 @@ type SolarRow = {
     mrc: number; omc: number; trc: number; oc1: number; kp: number; ec: number; shc: number; other: number; dc: number;
 };
 
-const createEmptyChargeRows = (): ChargeRow[] =>
-    windmillNumbers.map(wm => ({
-        windmill: wm, customer: "", seNumber: "",
-        mrc: 0, omc: 0, trc: 0, oc1: 0, kp: 0, ec: 0, shc: 0, other: 0, dc: 0,
-    }));
+
 
 const createInitialSolarRows = (): SolarRow[] =>
     initialSolarData.map(data => ({
@@ -119,14 +110,76 @@ export default function EnergyAllotment() {
 
     // State for Charge Allocation (8 windmills)
 
-    // State for Charge Allocation (8 windmills)
-    const [chargeAllocationRows, setChargeAllocationRows] = useState<ChargeRow[]>(createEmptyChargeRows());
+    // State for Dynamic Windmill Headers
+    const [windmillNumbers, setWindmillNumbers] = useState<string[]>(["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008", "SOLAR-001"]);
+
+    useEffect(() => {
+        const fetchWindmills = async () => {
+            try {
+                const response = await api.get("/windmills/active-posted");
+                if (Array.isArray(response.data)) {
+                    const numbers = response.data.map((item: any) => item.windmill_number).filter(Boolean);
+                    if (numbers.length > 0) {
+                        setWindmillNumbers(numbers);
+                        toast.success(`Fetched ${numbers.length} active windmills.`);
+                    } else {
+                        toast.warning("No active windmills found.");
+                    }
+                } else {
+                    toast.error("Unexpected response format from server.");
+                }
+            } catch (error) {
+                console.error("Error fetching windmills:", error);
+                toast.error("Failed to connect to server for windmill headers.");
+            }
+        };
+        fetchWindmills();
+    }, []);
+
+    // State for Charge Allocation
+    const [chargeAllocationRows, setChargeAllocationRows] = useState<ChargeRow[]>([]);
+
+    useEffect(() => {
+        setChargeAllocationRows(windmillNumbers.map(wm => ({
+            windmill: wm, customer: "", seNumber: "",
+            mrc: 0, omc: 0, trc: 0, oc1: 0, kp: 0, ec: 0, shc: 0, other: 0, dc: 0,
+        })));
+    }, [windmillNumbers]);
 
     // State for Solar Allocation
     const [solarAllocationRows, setSolarAllocationRows] = useState<SolarRow[]>(createInitialSolarRows());
 
     // State for Energy Allotment List
     const [energyAllotmentData, setEnergyAllotmentData] = useState<(typeof allotmentData[0] & Record<string, any>)[]>(allotmentData);
+
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const response = await api.get("/customers/active-posted-with-se");
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                    const formattedData = response.data.map(item => ({
+                        wm: "", // Placeholder or fetch if needed
+                        customer: item.customer_name,
+                        seNumber: item.service_number,
+                        consumption: "0",
+                        c1: "0", c1_pp: "0", c1_bank: "0",
+                        c2: "0", c2_pp: "0", c2_bank: "0",
+                        c4: "0", c4_pp: "0", c4_bank: "0",
+                        c5: "0", c5_pp: "0", c5_bank: "0",
+                        c1_allot: "0", c2_allot: "0", c4_allot: "0", c5_allot: "0"
+                    }));
+                    setEnergyAllotmentData(formattedData);
+                    toast.success(`Fetched ${formattedData.length} customers from master.`);
+                } else if (Array.isArray(response.data)) {
+                    toast.info("No active/posted customers found in master. Showing sample data.");
+                }
+            } catch (error) {
+                console.error("Error fetching customers for allotment:", error);
+                toast.error("Failed to fetch customers from master. Showing sample data.");
+            }
+        };
+        fetchCustomers();
+    }, []);
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -355,8 +408,8 @@ export default function EnergyAllotment() {
                                                 <TableHead rowSpan={2} className="h-10 font-semibold text-white whitespace-nowrap min-w-[120px] w-[120px] border-r border-white/20 bg-sidebar sticky left-0 z-50">Customer</TableHead>
                                                 <TableHead rowSpan={2} className="h-10 font-semibold text-white whitespace-nowrap min-w-[120px] w-[120px] border-r border-white/20 bg-sidebar sticky left-[120px] z-50">Service Number</TableHead>
                                                 <TableHead rowSpan={2} className="h-10 font-semibold text-white whitespace-nowrap min-w-[120px] w-[120px] border-r border-white/20 bg-sidebar sticky left-[240px] z-50"></TableHead>
-                                                {/* Fixed Generator Columns */}
-                                                {["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008", "SOLAR-001"].map((wm) => {
+                                                {/* Dynamic Generator Columns */}
+                                                {windmillNumbers.map((wm) => {
                                                     return (
                                                         <TableHead key={wm} colSpan={4} className="h-auto font-semibold text-center border-b border-r border-slate-400 last:border-r-0 p-0 align-top bg-white">
                                                             <div className="bg-sidebar text-white h-full flex items-center justify-center py-2">
@@ -368,7 +421,7 @@ export default function EnergyAllotment() {
                                                 <TableHead rowSpan={2} className="h-10 font-semibold text-white text-center border-b border-r border-white/20 align-middle">Total</TableHead>
                                             </TableRow>
                                             <TableRow className="bg-sidebar/85 hover:bg-sidebar/85 border-b-0">
-                                                {["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008", "SOLAR-001"].map((wm) => {
+                                                {windmillNumbers.map((wm) => {
                                                     const wmItems = energyAllotmentData.filter(d => d.wm === wm);
                                                     const renderColHeader = (col: 'c1' | 'c2' | 'c4' | 'c5', label: string, isLast = false) => {
                                                         const totalPP = wmItems.reduce((acc, curr) => acc + (Number(curr[`${col}_pp`]) || 0), 0);
@@ -411,7 +464,7 @@ export default function EnergyAllotment() {
                                         <TableBody>
                                             {/* Group Logic */}
                                             {(() => {
-                                                const generators = ["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008", "SOLAR-001"];
+                                                const generators = windmillNumbers;
                                                 // Group by Customer then SE Number
                                                 // Group by Customer then SE Number
                                                 const filteredData = energyAllotmentData.filter(item => {
@@ -811,7 +864,7 @@ export default function EnergyAllotment() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {["WM-001", "WM-002", "WM-003", "WM-004", "WM-005", "WM-006", "WM-007", "WM-008", "SOLAR-001"].map((wm, index) => (
+                                            {windmillNumbers.map((wm, index) => (
                                                 <TableRow key={index} className="hover:bg-slate-50 border-b border-slate-100">
                                                     <TableCell className="py-3 text-sm text-slate-700 font-medium pl-4">{index + 1}</TableCell>
                                                     <TableCell className="py-3 text-sm text-slate-700 font-medium">{wm}</TableCell>

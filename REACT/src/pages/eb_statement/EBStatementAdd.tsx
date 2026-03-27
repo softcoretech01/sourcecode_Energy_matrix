@@ -120,7 +120,7 @@ export default function EBStatementAdd() {
             if (res.data.filename) {
                 toast.success("EB Statement uploaded successfully");
                 // Open in a new tab
-                window.open(`/eb-statement/pdf?file=${res.data.filename}`, "_blank");
+                window.open(`${import.meta.env.BASE_URL}eb-statement/pdf?file=${res.data.filename}`, "_blank");
             } else {
                 toast.error(res.data.message || "Upload failed");
             }

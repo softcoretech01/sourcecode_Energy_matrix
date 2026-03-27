@@ -234,7 +234,7 @@ export default function EBStatementList() {
                                                         className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
                                                         onClick={() => {
                                                             const filename = row.pdf.split(/[\\/]/).pop();
-                                                            window.open(`/eb-statement/pdf?file=${filename}`, "_blank");
+                                                            window.open(`${import.meta.env.BASE_URL}eb-statement/pdf?file=${filename}`, "_blank");
                                                         }}
                                                     >
                                                         <FileText className="h-4 w-4" />

@@ -43,6 +43,17 @@ class Windmill(Base):
     modified_at = Column(DateTime)
     is_submitted = Column(SmallInteger)
 
+    @staticmethod
+    def get_active_posted_windmills(cursor):
+        """
+        Fetches windmill numbers from the master table that are 'Windmill' or 'Solar',
+        status is 'Active' or '1', and is_submitted (posted).
+        """
+        # Inline SQL query in the model file as requested by the user.
+        sql = "CALL sp_get_active_posted_windmills_for_allotment()"
+        cursor.execute(sql)
+        return cursor.fetchall()
+
 
 # =====================================================
 # 🔵 WINDMILL UPLOADS TABLE (master_windmill_upload_docs)

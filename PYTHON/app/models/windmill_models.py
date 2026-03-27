@@ -11,7 +11,7 @@ class Actual(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     customer_id = Column(Integer)
-    service_number_id = Column(Integer)
+    sc_id = Column(Integer)  # Matching DB column name
     actual_year = Column(Integer)   # year
     actual_month = Column(SmallInteger) # tinyint
     pdf_file_path = Column(String(255))
@@ -31,7 +31,7 @@ class EBBill(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     customer_id = Column(Integer)
-    service_number_id = Column(Integer)
+    sc_id = Column(Integer) # Matching DB column name
     bill_year = Column(Integer)   # year
     bill_month = Column(SmallInteger) # tinyint
     pdf_file_path = Column(String(255))
@@ -42,6 +42,50 @@ class EBBill(Base):
     modified_at = Column(DateTime)
     is_submitted = Column(SmallInteger)
 
+
+# =====================================================
+# 🔵 EB BILL DETAILS TABLE (eb_bill_details)
+# =====================================================
+class EBBillDetails(Base):
+    __tablename__ = "eb_bill_details"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    eb_bill_header_id = Column(Integer, ForeignKey("eb_bill.id"), nullable=False)
+    customer_id = Column(Integer, nullable=False)
+    customer_service_id = Column(Integer, nullable=False)
+    self_generation_tax = Column(DECIMAL(12, 2), default=0.00)
+    
+    created_by = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+    modified_by = Column(Integer)
+    modified_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    is_submitted = Column(SmallInteger, default=0)
+
+# =====================================================
+# 🔵 EB BILL ADJUSTMENT CHARGES TABLE (eb_bill_adjustment_charges)
+# =====================================================
+class EBBillAdjustmentCharges(Base):
+    __tablename__ = "eb_bill_adjustment_charges"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    eb_bill_header_id = Column(Integer, ForeignKey("eb_bill.id"), nullable=False)
+    energy_number = Column(String(50), nullable=False)
+    c001 = Column(DECIMAL(12, 2), default=0.00)
+    c002 = Column(DECIMAL(12, 2), default=0.00)
+    c003 = Column(DECIMAL(12, 2), default=0.00)
+    c004 = Column(DECIMAL(12, 2), default=0.00)
+    c005 = Column(DECIMAL(12, 2), default=0.00)
+    c006 = Column(DECIMAL(12, 2), default=0.00)
+    c007 = Column(DECIMAL(12, 2), default=0.00)
+    c008 = Column(DECIMAL(12, 2), default=0.00)
+    c010 = Column(DECIMAL(12, 2), default=0.00)
+    wheeling_charges = Column(DECIMAL(12, 2), default=0.00)
+    
+    created_by = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+    modified_by = Column(Integer)
+    modified_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    is_submitted = Column(SmallInteger, default=0)
 
 # =====================================================
 # 🔵 EB STATEMENTS TABLE (eb_statements)

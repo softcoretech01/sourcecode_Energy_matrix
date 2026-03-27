@@ -1,0 +1,4 @@
+{
+  "get_eb_bill_customers": "BEGIN\n            SELECT DISTINCT mc.id, mc.customer_name \n            FROM masters.master_customers mc\n            WHERE mc.status = \"Active\" AND mc.is_submitted = 1\n            ORDER BY mc.customer_name;\n        END",
+  "get_eb_bill_service_number": "BEGIN\n            SELECT id, service_number \n            FROM masters.customer_service \n            WHERE customer_id = cust_id AND status = \"Active\"\n            ORDER BY service_number;\n        END"
+}

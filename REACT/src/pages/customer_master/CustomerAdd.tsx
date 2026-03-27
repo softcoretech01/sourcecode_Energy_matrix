@@ -42,12 +42,13 @@ export default function CustomerAdd() {
     const [gstNumber, setGstNumber] = useState("");
 
     // SE Number State
-    const [seNumbers, setSeNumbers] = useState<{ id: number; seNumber: string; kva: string; edcCircle: number; remarks: string; status: string }[]>([]);
+    const [seNumbers, setSeNumbers] = useState<{ id: number; seNumber: string; kva: string; edcCircle: number; remarks: string; status: string; perCostUnit: string }[]>([]);
     const [newSeNumber, setNewSeNumber] = useState("");
     const [newKva, setNewKva] = useState("");
     const [newEdcCircle, setNewEdcCircle] = useState(""); // keep as string for Select, convert to number on save
     const [newSeRemarks, setNewSeRemarks] = useState("");
     const [newSeStatus, setNewSeStatus] = useState("active");
+    const [newPerCostUnit, setNewPerCostUnit] = useState("");
     const [edcList, setEdcList] = useState<{ id: number; edc_name?: string; edc_circle?: string }[]>([]);
     const [kvaList, setKvaList] = useState<{ id: number; kva?: string; capacity?: string }[]>([]);
 
@@ -152,9 +153,10 @@ export default function CustomerAdd() {
                 id: Date.now(),
                 seNumber: newSeNumber,
                 kva: newKva,
-                edcCircle: newEdcCircle ? parseInt(newEdcCircle, 10) : (null as any), // Store as number or null
+                edcCircle: newEdcCircle ? parseInt(newEdcCircle, 10) : (null as any),
                 remarks: newSeRemarks,
-                status: newSeStatus
+                status: newSeStatus,
+                perCostUnit: newPerCostUnit,
             },
         ]);
         setNewSeNumber("");
@@ -162,6 +164,7 @@ export default function CustomerAdd() {
         setNewEdcCircle("");
         setNewSeRemarks("");
         setNewSeStatus("active");
+        setNewPerCostUnit("");
     };
 
     // save customer to backend
@@ -279,9 +282,10 @@ export default function CustomerAdd() {
                     body: JSON.stringify({
                         se_number: se.seNumber,
                         kva: se.kva,
-                        edc_circle: se.edcCircle, // Already a number
+                        edc_circle: se.edcCircle,
                         status: se.status === "Active" || se.status === "active" ? 1 : 0,
                         remarks: se.remarks,
+                        per_cost_unit: se.perCostUnit ? parseFloat(se.perCostUnit) : null,
                     }),
                 });
                 let data = null;
@@ -682,7 +686,8 @@ export default function CustomerAdd() {
                             <TabsContent value="se_number" className="mt-0 space-y-6 pt-2">
                                 <div className="space-y-6 max-w-6xl">
                                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                        <div className="md:col-span-3 space-y-2">
+                                        {/* Row 1: all main fields */}
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">Service Number</label>
                                             <Input
                                                 value={newSeNumber}
@@ -691,7 +696,7 @@ export default function CustomerAdd() {
                                                 className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
                                             />
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">KVA</label>
                                             <Select value={newKva} onValueChange={setNewKva}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -710,7 +715,7 @@ export default function CustomerAdd() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">EDC Circle</label>
                                             <Select value={newEdcCircle} onValueChange={setNewEdcCircle}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -731,7 +736,7 @@ export default function CustomerAdd() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-3 space-y-2">
+                                        <div className="md:col-span-2 space-y-2">
                                             <label className="text-sm font-semibold text-slate-700">Status</label>
                                             <Select value={newSeStatus} onValueChange={setNewSeStatus}>
                                                 <SelectTrigger className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500">
@@ -743,24 +748,35 @@ export default function CustomerAdd() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="md:col-span-12 space-y-2">
-                                            <label className="text-sm font-semibold text-slate-700">Remarks</label>
+                                        <div className="md:col-span-2 space-y-2">
+                                            <label className="text-sm font-semibold text-slate-700">Per Cost Unit (₹)</label>
                                             <Input
-                                                value={newSeRemarks}
-                                                onChange={(e) => setNewSeRemarks(e.target.value)}
-                                                placeholder="Enter Remarks"
-                                                maxLength={200}
+                                                type="number"
+                                                value={newPerCostUnit}
+                                                onChange={(e) => setNewPerCostUnit(e.target.value)}
+                                                placeholder="e.g. 5.50"
                                                 className="bg-white border-slate-300 h-10 text-sm focus:ring-blue-500"
                                             />
-                                            <div className="text-right text-xs text-slate-500">{newSeRemarks.length}/200</div>
                                         </div>
-                                        <div className="md:col-span-2 md:col-start-11">
+                                        <div className="md:col-span-2 flex items-end">
                                             <Button
                                                 onClick={handleAddSeNumber}
                                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-10"
                                             >
                                                 <UserPlus className="h-4 w-4 mr-2" /> Add
                                             </Button>
+                                        </div>
+                                        {/* Row 2: Remarks — compact */}
+                                        <div className="md:col-span-5 space-y-1">
+                                            <label className="text-sm font-semibold text-slate-700">Remarks</label>
+                                            <Input
+                                                value={newSeRemarks}
+                                                onChange={(e) => setNewSeRemarks(e.target.value)}
+                                                placeholder="Enter Remarks"
+                                                maxLength={200}
+                                                className="bg-white border-slate-300 h-9 text-sm focus:ring-blue-500"
+                                            />
+                                            <div className="text-right text-xs text-slate-400">{newSeRemarks.length}/200</div>
                                         </div>
                                     </div>
 
@@ -773,6 +789,7 @@ export default function CustomerAdd() {
                                                     <th className="px-4 py-3 border-r border-slate-200">KVA</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">EDC Circle</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">Status</th>
+                                                    <th className="px-4 py-3 border-r border-slate-200">Per Cost Unit (₹)</th>
                                                     <th className="px-4 py-3 border-r border-slate-200">Remarks</th>
                                                 </tr>
                                             </thead>
@@ -799,6 +816,7 @@ export default function CustomerAdd() {
                                                                     item.edcCircle}
                                                             </td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100 capitalize">{item.status}</td>
+                                                            <td className="px-4 py-3 text-slate-600 border-r border-slate-100">{item.perCostUnit || "—"}</td>
                                                             <td className="px-4 py-3 text-slate-600 border-r border-slate-100">{item.remarks}</td>
                                                         </tr>
                                                     ))

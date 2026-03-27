@@ -56,19 +56,45 @@ async def add_customer(data: CustomerCreate, user: dict = Depends(get_current_us
 
 @router.get("")
 async def get_customers(user: dict = Depends(get_current_user)):
-
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        cursor.execute("CALL sp_get_customers()")
+        rows = cursor.fetchall()
+        return rows
+    finally:
+        cursor.close()
+        conn.close()
 
-    cursor.execute("CALL sp_get_customers()")
+# -----------------------------------------------------
+# 🔵 GET CUSTOMER WITH SERVICE NUMBERS (Posted & Active only) - For Energy Allotment
+# -----------------------------------------------------
+@router.get("/active-posted-with-se")
+async def get_active_posted_customers_with_se(user: dict = Depends(get_current_user)):
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        cursor.callproc("sp_get_active_posted_customers_with_se")
+        rows = cursor.fetchall()
+        return rows
+    finally:
+        cursor.close()
+        conn.close()
 
-    rows = cursor.fetchall()
-    print("[DEBUG] /api/customers response:", rows)  # Log the response
-
-    cursor.close()
-    conn.close()
-
-    return rows
+# -----------------------------------------------------
+# 🔵 GET CUSTOMER DROPDOWN (Posted only)
+# -----------------------------------------------------
+@router.get("/dropdown")
+async def get_customer_dropdown(user: dict = Depends(get_current_user)):
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        cursor.callproc("sp_get_customer_dropdown")
+        rows = cursor.fetchall()
+        return rows
+    finally:
+        cursor.close()
+        conn.close()
 
 # -----------------------------------------------------
 # 🟢 EXPORT CUSTOMERS EXCEL
@@ -219,7 +245,7 @@ async def add_se_number(customer_id: int, data: dict, user: dict = Depends(get_c
         conn.close()
         raise HTTPException(status_code=400, detail="This Service Number is already added for this customer.")
 
-    cursor.execute("CALL sp_add_customer_se(%s,%s,%s,%s,%s,%s,%s,%s)", (
+    cursor.execute("CALL sp_add_customer_se(%s,%s,%s,%s,%s,%s,%s,%s,%s)", (
         customer_id,
         data["se_number"],
         data.get("kva"),
@@ -227,7 +253,8 @@ async def add_se_number(customer_id: int, data: dict, user: dict = Depends(get_c
         data.get("status", 1),
         data.get("remarks"),
         data.get("is_submitted", 0),
-        user["id"]
+        user["id"],
+        data.get("per_cost_unit"),
     ))
 
     conn.commit()
@@ -308,7 +335,8 @@ async def update_customer_se(customer_id: int, se_id: int, data: dict, user: dic
         data.get("status", 1),
         data.get("remarks"),
         data.get("is_submitted", 0),
-        user["id"]
+        user["id"],
+        data.get("per_cost_unit"),
     ))
 
     conn.commit()

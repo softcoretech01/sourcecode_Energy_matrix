@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
-import { ArrowLeft, Calendar as CalendarIcon, UploadCloud } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { ArrowLeft, Calendar as CalendarIcon, UploadCloud, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import api, { BACKEND_API_URL } from "@/services/api";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -10,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import {
     Table,
     TableBody,
@@ -25,7 +27,107 @@ export default function EBBillAdd() {
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);   // ✅ added loading state
+    const [customers, setCustomers] = useState<Array<{ id: number; customer_name: string }>>([]);
+    const [serviceNumbers, setServiceNumbers] = useState<Array<{ id: number; service_number: string }>>([]);
+    const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+    const [selectedServiceNumberId, setSelectedServiceNumberId] = useState<string>("");
+    const [customerLoading, setCustomerLoading] = useState<boolean>(true);
+    const [serviceLoading, setServiceLoading] = useState<boolean>(false);
+    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+    const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const { toast } = useToast();
+
+    const showError = (msg: string) => {
+        toast({
+            variant: "destructive",
+            title: "Validation Error",
+            description: msg,
+            duration: 5000,
+        });
+    };
+
+    useEffect(() => {
+        const loadCustomers = async () => {
+            try {
+                setCustomerLoading(true);
+                const res = await api.get("/eb-bill/customers", { timeout: 30000 });
+                console.debug("EBBillAdd customers response:", res);
+                if (res.status !== 200) throw new Error(res.data?.detail || `HTTP ${res.status}`);
+
+                let data = Array.isArray(res.data.data) ? res.data.data : [];
+
+                if (data.length === 0) {
+                    // database is empty; try seeding default data in backend and refetch
+                    try {
+                        const seedRes = await api.post("/eb-bill/seed", null, { timeout: 30000 });
+                        if (seedRes.status === 200 && seedRes.data?.status === "success") {
+                            // re-fetch after seed
+                            const res2 = await api.get("/eb-bill/customers", { timeout: 30000 });
+                            data = Array.isArray(res2.data.data) ? res2.data.data : [];
+                        }
+                    } catch (seedErr: any) {
+                        // /seed may be unavailable in some environments; continue with no customers
+                        if (seedErr?.response?.status === 404) {
+                            console.warn("Seed endpoint not available, skipping seed", seedErr);
+                        } else {
+                            console.error("Seed customers failed", seedErr);
+                        }
+                    }
+                }
+
+                setCustomers(data);
+
+                if (data.length > 0) {
+                    setSelectedCustomerId(String(data[0].id));
+                } else {
+                    setSelectedCustomerId("");
+                }
+            } catch (err) {
+                console.error("Failed to load customers", err);
+                setCustomers([]);
+                setSelectedCustomerId("");
+            } finally {
+                setCustomerLoading(false);
+            }
+        };
+
+        loadCustomers();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedCustomerId) {
+            setServiceNumbers([]);
+            setSelectedServiceNumberId("");
+            return;
+        }
+
+        const loadServiceNumbers = async () => {
+            try {
+                setServiceLoading(true);
+                const res = await api.get(`/eb-bill/service-numbers/${selectedCustomerId}`, { timeout: 30000 });
+                console.debug("EBBillAdd service numbers response:", res);
+                if (res.status !== 200) throw new Error(res.data?.detail || `HTTP ${res.status}`);
+
+                const data = Array.isArray(res.data.data) ? res.data.data : [];
+                setServiceNumbers(data);
+
+                if (data.length > 0) {
+                    setSelectedServiceNumberId(String(data[0].id));
+                } else {
+                    setSelectedServiceNumberId("");
+                }
+            } catch (err) {
+                console.error("Failed to load service numbers", err);
+                setServiceNumbers([]);
+                setSelectedServiceNumberId("");
+            } finally {
+                setServiceLoading(false);
+            }
+        };
+
+        loadServiceNumbers();
+    }, [selectedCustomerId]);
 
     const handleUploadClick = () => {
         fileInputRef.current?.click();
@@ -36,61 +138,94 @@ export default function EBBillAdd() {
         if (!file) return;
 
         if (file.type !== "application/pdf") {
-            alert("Only PDF files allowed");
+            showError("Only PDF files allowed");
             return;
         }
 
         setSelectedFile(file);
     };
 
-    // ✅ Updated function with correct URL + loading state
     const handleReadPdf = async () => {
         if (!selectedFile) {
-            alert("Please select PDF first");
+            showError("Please select PDF first");
+            return;
+        }
+
+        if (!selectedCustomerId) {
+            showError("Please select a valid customer");
+            return;
+        }
+
+        if (!selectedServiceNumberId) {
+            showError("Please select a valid SE number");
+            return;
+        }
+
+        if (!selectedYear) {
+            showError("Please select a year");
+            return;
+        }
+
+        if (!selectedMonth) {
+            showError("Please select a month");
             return;
         }
 
         const formData = new FormData();
         formData.append("file", selectedFile);
+        formData.append("customer_id", selectedCustomerId);
+        formData.append("service_number_id", selectedServiceNumberId);
+        formData.append("year", selectedYear);
+        formData.append("month", selectedMonth);
 
         try {
             setLoading(true);
 
-            const res = await fetch(
-                `${BACKEND_API_URL}/eb-bill/read-pdf`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+            const res = await api.post("/eb-bill/read-pdf", formData, {
+                timeout: 300000,
+            });
 
-            if (!res.ok) throw new Error("Upload failed");
-
-            const data = await res.json();
-
-            // avoid storing the full extracted PDF text in sessionStorage
-            const storeData: any = { ...data };
-            if (storeData.parsed && storeData.parsed.full_text) {
-                delete storeData.parsed.full_text;
-                if (Object.keys(storeData.parsed).length === 0) {
-                    delete storeData.parsed;
-                }
+            if (res.status !== 200) {
+                const message = res.data?.detail || res.data?.message || "Upload failed";
+                showError(`Failed to read PDF: ${message}`);
+                return;
             }
 
+            const data = res.data;
+
+            // Resolve the display labels from the selected dropdown IDs
+            const selectedCustomer = customers.find(c => String(c.id) === selectedCustomerId);
+            const selectedServiceNumber = serviceNumbers.find(s => String(s.id) === selectedServiceNumberId);
+            const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            const storeData = {
+                ...JSON.parse(JSON.stringify(data)),
+                // Override with dropdown selections — these are authoritative
+                customer_id: selectedCustomerId,
+                service_number_id: selectedServiceNumberId,
+                customer_name: selectedCustomer?.customer_name ?? data.customer_name ?? "",
+                service_number: selectedServiceNumber?.service_number ?? data.service_number ?? "",
+                bill_year: selectedYear,
+                bill_month: selectedMonth,
+                bill_month_name: monthNames[parseInt(selectedMonth) - 1] ?? "",
+            };
+
             sessionStorage.setItem("ebData", JSON.stringify(storeData));
-                // store a local blob URL so the PDF can be embedded in the PDF view
-                try {
-                    const pdfUrl = URL.createObjectURL(selectedFile as Blob);
-                    sessionStorage.setItem("ebPdfUrl", pdfUrl);
-                } catch (err) {
-                    console.warn("failed to create object URL for PDF", err);
-                }
+
+
+            try {
+                const pdfUrl = URL.createObjectURL(selectedFile as Blob);
+                sessionStorage.setItem("ebPdfUrl", pdfUrl);
+            } catch (err) {
+                console.warn("failed to create object URL for PDF", err);
+            }
 
             navigate("/windmill/eb-bill/pdf");
 
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert("Failed to read PDF");
+            const errorMessage = err.response?.data?.detail || err.message || "Unknown error";
+            showError(`${errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -122,12 +257,6 @@ export default function EBBillAdd() {
                         EB Bill - Upload
                     </h1>
                     <div className="flex gap-2">
-                        <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white h-8 px-4">
-                            Save
-                        </Button>
-                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-4">
-                            Post
-                        </Button>
                         <Button
                             size="sm"
                             variant="outline"
@@ -145,40 +274,67 @@ export default function EBBillAdd() {
 
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-slate-600">Customers</label>
-                                <Select>
+                                <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
                                     <SelectTrigger className="w-full border-slate-300 h-9">
                                         <SelectValue placeholder="Select Customer" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="cust-001">L&T</SelectItem>
-                                        <SelectItem value="cust-002">Texmo</SelectItem>
+                                        {customerLoading ? (
+                                            <SelectItem value="loading" disabled>
+                                                Loading customers...
+                                            </SelectItem>
+                                        ) : customers.length === 0 ? (
+                                            <SelectItem value="no-customers" disabled>
+                                                No customers found
+                                            </SelectItem>
+                                        ) : (
+                                            customers.map((cust) => (
+                                                <SelectItem key={cust.id} value={String(cust.id)}>
+                                                    {cust.customer_name}
+                                                </SelectItem>
+                                            ))
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-slate-600">SE Number</label>
-                                <Select>
+                                <Select value={selectedServiceNumberId} onValueChange={setSelectedServiceNumberId}>
                                     <SelectTrigger className="w-full border-slate-300 h-9">
                                         <SelectValue placeholder="Select SE Number" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="se-001">SE-1001</SelectItem>
-                                        <SelectItem value="se-002">SE-1002</SelectItem>
-                                        <SelectItem value="se-003">SE-2001</SelectItem>
+                                        {serviceLoading ? (
+                                            <SelectItem value="loading-se" disabled>
+                                                Loading SE numbers...
+                                            </SelectItem>
+                                        ) : serviceNumbers.length === 0 ? (
+                                            <SelectItem value="no-service-number" disabled>
+                                                No SE numbers found
+                                            </SelectItem>
+                                        ) : (
+                                            serviceNumbers.map((svc) => (
+                                                <SelectItem key={svc.id} value={String(svc.id)}>
+                                                    {svc.service_number}
+                                                </SelectItem>
+                                            ))
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-slate-600">Year</label>
-                                <Select defaultValue={currentYear.toString()}>
+                                <Select value={selectedYear} onValueChange={setSelectedYear}>
                                     <SelectTrigger className="w-full border-slate-300 h-9">
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {years.map((year) => (
-                                            <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                                            <SelectItem key={year} value={year.toString()}>
+                                                {year}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -186,13 +342,15 @@ export default function EBBillAdd() {
 
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-slate-600">Month</label>
-                                <Select>
+                                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                                     <SelectTrigger className="w-full border-slate-300 h-9">
                                         <SelectValue placeholder="Select Month" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {months.map((m) => (
-                                            <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                            <SelectItem key={m.value} value={m.value}>
+                                                {m.label}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

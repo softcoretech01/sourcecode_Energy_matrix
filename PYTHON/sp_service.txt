@@ -1,0 +1,7 @@
+=== get_eb_bill_service_number ===
+BEGIN
+            SELECT id, service_number 
+            FROM masters.customer_service 
+            WHERE customer_id = cust_id AND status = "Active"
+            ORDER BY service_number;
+        END

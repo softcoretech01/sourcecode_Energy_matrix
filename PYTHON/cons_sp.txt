@@ -1,0 +1,52 @@
+=== GetConsumptionDropdownData SP ===
+BEGIN
+            SELECT mc.id AS customer_id, mc.customer_name, cs.id AS service_id, cs.service_number
+            FROM masters.master_customers mc
+            JOIN masters.customer_service cs ON mc.id = cs.customer_id
+            WHERE mc.is_submitted = 1 AND mc.status = "Active" AND cs.status = "Active"
+            ORDER BY mc.customer_name;
+        END
+
+=== sp_get_consumption_requests SP ===
+BEGIN
+    SELECT
+        mc.id AS customer_id,
+        mc.customer_name,
+        cs.id AS service_id,
+        cs.service_number AS sc_number,
+        COALESCE(cc.c1, 0) AS c1,
+        COALESCE(cc.c2, 0) AS c2,
+        COALESCE(cc.c4, 0) AS c4,
+        COALESCE(cc.c5, 0) AS c5,
+        COALESCE(cc.total, 0) AS total,
+        cc.id AS request_id
+    FROM masters.master_customers mc
+    INNER JOIN masters.customer_service cs ON mc.id = cs.customer_id
+    LEFT JOIN windmill.customer_consumption_requests cc ON mc.id = cc.customer_id
+        AND cs.id = cc.service_id
+        AND cc.billing_year = p_year
+        AND cc.billing_month = p_month
+    ORDER BY mc.customer_name, cs.service_number;
+END
+
+=== customer_consumption_requests columns ===
+  ('id', 'int', 'NO', 'PRI', None, 'auto_increment')
+  ('customer_id', 'int', 'NO', '', None, '')
+  ('service_id', 'int', 'NO', '', None, '')
+  ('c1', 'decimal(10,2)', 'YES', '', '0.00', '')
+  ('c2', 'decimal(10,2)', 'YES', '', '0.00', '')
+  ('c4', 'decimal(10,2)', 'YES', '', '0.00', '')
+  ('c5', 'decimal(10,2)', 'YES', '', '0.00', '')
+  ('total', 'decimal(12,2)', 'YES', '', '0.00', '')
+  ('billing_year', 'int', 'NO', '', None, '')
+  ('billing_month', 'smallint', 'NO', '', None, '')
+  ('billing_day', 'smallint', 'NO', '', None, '')
+  ('created_by', 'int', 'YES', '', None, '')
+  ('created_at', 'datetime', 'YES', '', 'CURRENT_TIMESTAMP', 'DEFAULT_GENERATED')
+  ('modified_by', 'int', 'YES', '', None, '')
+  ('modified_at', 'datetime', 'YES', '', None, 'on update CURRENT_TIMESTAMP')
+  ('is_submitted', 'smallint', 'YES', '', '0', '')
+
+=== Distinct customers in consumption requests ===
+  customer_id=1, name=L&T
+  customer_id=2, name=Texmo 

@@ -17,7 +17,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "uploads", "eb_statements")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def extract_eb_statement_data(pdf_path, expected_windmill_no):
+def extract_eb_statement_data(pdf_path, expected_windmill_no, expected_year=None, expected_month=None):
     data = {
         "company_name": None,
         "windmill_number": None,
@@ -117,6 +117,7 @@ def extract_eb_statement_data(pdf_path, expected_windmill_no):
 
 
     # Validation
+    # Validation
     if data["windmill_number"] and expected_windmill_no:
         pdf_wm = re.sub(r"\D", "", str(data["windmill_number"]))
         expected_wm = re.sub(r"\D", "", str(expected_windmill_no))
@@ -124,9 +125,33 @@ def extract_eb_statement_data(pdf_path, expected_windmill_no):
         if pdf_wm != expected_wm:
             # We check if one contains the other (e.g. 12 digits vs 10 digits)
             if pdf_wm not in expected_wm and expected_wm not in pdf_wm:
-                raise Exception(f"Windmill No mismatch! PDF has {data['windmill_number']}, but you selected {expected_windmill_no}")
-    
+                raise Exception(f"Mismatch: PDF Windmill No ({data['windmill_number']}) does not match selected ({expected_windmill_no})")
+                
+    if expected_month:
+        month_names = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+        # If expected_month is a digit like '3', get 'march' / 'mar'
+        if str(expected_month).isdigit() and 1 <= int(expected_month) <= 12:
+            idx = int(expected_month) - 1
+            long_names = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+            short_month = month_names[idx]
+            long_month = long_names[idx]
+            display_name = long_month.capitalize()
+        else:
+            long_month = str(expected_month).lower()
+            short_month = long_month[:3]
+            display_name = str(expected_month).capitalize()
+            
+        # Use regex to match exactly 'march' or 'mar' as a whole word to prevent matching "margin"!
+        if not re.search(rf"\b({short_month}|{long_month})\b", full_text.lower()):
+            raise Exception(f"Mismatch: PDF does not appear to be for Month '{display_name}'")
+                
+    if expected_year:
+        # Use word boundaries so "2026" doesn't match inside "120264"
+        if not re.search(rf"\b{expected_year}\b", full_text):
+            raise Exception(f"Mismatch: PDF does not appear to be for Year '{expected_year}'")
+
     return data
+
 
 
 @router.post("/upload", response_model=EBStatementUploadResponse)
@@ -163,7 +188,7 @@ async def upload_eb_statement(
 
         # Parse PDF Data
         try:
-            parsed_data = extract_eb_statement_data(file_path, expected_wm_no)
+            parsed_data = extract_eb_statement_data(file_path, expected_wm_no, year, month)
         except Exception as pe:
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -283,8 +308,8 @@ async def get_windmills(user: dict = Depends(get_current_user)):
     cursor = conn.cursor()
 
     try:
-        # Filter by type = 'windmill' to show only windmill type records
-        cursor.execute("SELECT id, windmill_number FROM masters.master_windmill WHERE type = 'windmill' ORDER BY windmill_number")
+        # Filter by type = 'windmill' and posted status to show only active windmill type records
+        cursor.execute("SELECT id, windmill_number FROM masters.master_windmill WHERE LOWER(type) = 'windmill' AND is_submitted = 1 ORDER BY windmill_number")
 
         rows = cursor.fetchall()
 
